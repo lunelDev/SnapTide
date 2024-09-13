@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ko"  xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/layout/basic :: setContent(~{this::content})}">
+  <th:block th:fragment="content" >
+    <!-- Header-->
+
+    <header class="bg-dark py-5">
+      <div class="container px-4 px-lg-5 my-5">
+        <div class="text-center text-white">
+          <h1 class="display-4 fw-bolder">InstaGram Feed List</h1>
+          <div class="d-grid gap-2 col-6 mx-auto">
+            <a class="btn btn-outline-primary m-4 " th:href="@{/feeds/register}">Register</a>
+          </div>
+          <div class="d-grid gap-2 col-8 mx-auto">
+            <form th:action="@{/feeds/list}" id="frmSearch" method="get">
+              <div class="input-group m-4 ">
+                <div class="input-group-prepend" style="margin-right:10px;">
+                  <select class="form-control" id="type" name="type">
+                    <option th:selected="${pageRequestDTO.type == null}">선택하세요</option>
+                    <option value="t" th:selected="${pageRequestDTO.type == 't'}">제목</option>
+                    <option value="c" th:selected="${pageRequestDTO.type == 'c'}">내용</option>
+                    <option value="tc" th:selected="${pageRequestDTO.type == 'tc'}">제목+내용</option>
+                  </select>
+                </div>
+                <input type="text" class="form-control" name="keyword" style="border-radius:5px"
+                       id="keyword" th:value="${pageRequestDTO.keyword}">
+                <div class="input-group-append" style="margin-left:10px;">
+                  <button class="btn btn-outline-primary btnSearch">Search</button>
+                </div>
+              </div>
+            </form>
+          </div>
+          <p class="lead fw-normal text-white-50 mb-0">create by. Enney 2024-08-16</p>
+        </div>
+      </div>
+    </header>
+  <body>
+  <!-- Section-->
+  <section>
+    <div class="container px-4 px-lg-5 mt-5">
+      <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+        <!--1 번-->
+        <div class="col mb-5"  th:each="feedsDTO : ${pageResultDTO.dtoList}"
+             th:onclick="goRead([[${feedsDTO.fno}]],[[${pageResultDTO.page}]],[[${pageRequestDTO.type}]], [[${pageRequestDTO.keyword}]])"
+             style="cursor:pointer;">
+          <div class="card h-100">
+            <!-- Product image-->
+            <div>
+              <!-- 조건 확인 -->
+              <p th:text="'Size: ' + ${feedsDTO.photosDTOList.size()}"></p>
+              <p th:if="${!feedsDTO.photosDTOList.isEmpty()}"
+                 th:text="'Path: ' + ${feedsDTO.photosDTOList[0].path}"></p>
+              <p th:if="${!feedsDTO.photosDTOList.isEmpty()}"
+                 th:text="'Thumbnail URL: ' + ${feedsDTO.photosDTOList[0].getThumbnailURL()}"></p>
+            </div>
+            <!-- 피드 이미지가 있을 때만 표시되는 이미지 -->
+            <img th:if="${feedsDTO.photosDTOList.size() > 0 && feedsDTO.photosDTOList[0].path != null}"
+                 th:src="|@{/display(fileName=${feedsDTO.photosDTOList[0].getThumbnailURL()})}|"
+                 class="card-img-top"
+                 alt="Feed Image" />
+
+<!--            &lt;!&ndash; 기본 이미지: 피드 이미지가 없거나 유효하지 않을 때 표시 &ndash;&gt;-->
+            <img th:unless="${feedsDTO.photosDTOList.size() > 0 && feedsDTO.photosDTOList[0].path != null}"
+                 src="https://dummyimage.com/450x300/dee2e6/6c757d.jpg"
+                 class="card-img-top"
+                 alt="Default Image" />
+
+            <!-- Product details-->
+            <div class="card-body p-4">
+              <div class="text-center">
+                <!-- Product name-->
+                <h5 class="fw-bolder" th:text="${feedsDTO != null} ? ${feedsDTO.title} : '제목이 없습니다'"></h5>
+                <!-- Product price-->
+                <p th:text="${feedsDTO != null} ? ${feedsDTO.content} : '내용이 없습니다'"></p>
+              </div>
+            </div>
+            <!-- Product actions-->
+            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+              <div class="text-center">
+                <a class="btn btn-outline-dark mt-auto"
+                   th:onclick="goRead([[${feedsDTO.fno}]],[[${pageResultDTO.page}]],
+                      [[${pageRequestDTO.type}]], [[${pageRequestDTO.keyword}]])">View options</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 하단에 페이지 바 디자인 구현-->
+    <ul class="pagination h-100 justify-content-center align-items-center">
+      <li class="page-item " th:if="${pageResultDTO.prev}">
+        <a class="page-link" tabindex="-1"
+           th:href="@{/feeds/list(page=${pageResultDTO.start-1})}">Prev</a>
+      </li>
+      <li th:each="page : ${pageResultDTO.pageList}"
+          th:class=" 'page-item ' + ${pageResultDTO.page == page?'active':''} ">
+        <a class="page-link"
+           th:href="@{/feeds/list(page=${page},type=${pageRequestDTO.type},keyword=${pageRequestDTO.keyword})}">[[${page}]]</a>
+      </li>
+      <li class="page-item " th:if="${pageResultDTO.next}">
+        <a class="page-link"
+           th:href="@{/feeds/list(page=${pageResultDTO.end+1})}">Next</a>
+      </li>
+    </ul>
+    <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script th:inline="javascript">
+    // document의 태그를 모두 읽고 난뒤 실행되는 함수
+          window.onload = function(){
+            frmSearch = document.querySelector("#frmSearch")
+            btnSearch = document.querySelector(".btnSearch")
+            type = document.querySelector("#type");
+            keyword = document.querySelector("#keyword")
+
+            btnSearch.onclick = e => {
+              e.preventDefault();
+              if(!keyword.value) {
+                keyword.focus();
+                return;
+              }
+              frmSearch.submit();
+            }
+            type.onchange = () => {
+              if(type.options[0].selected) {
+                location.href = /*[[@{/feeds/list}]]*/'url'
+              } else {
+                keyword.disabled = false;
+                btnSearch.disabled = false;
+              }
+            }
+            const requestKeyword = /*[[${pageRequestDTO.keyword}]]*/'keyword'
+            keyword.disabled = requestKeyword?false:true;
+            btnSearch.disabled = requestKeyword?false:true;
+
+            var msg = [[${msg}]]
+            // 일회성 msg의 내용이 비거나 history 상태가 비지 않는 경우 return
+            if(msg === '' || history.state) return
+
+            if(msg) {  // truthy 데이터가 올 경우만 if문 실행
+              const myModal = new bootstrap.Modal(document.querySelector('#myModal'),
+                              { backdrop: true });
+              document.querySelector(".modal-body").innerHTML
+                = `<p>${msg}되었습니다.</p>`
+              myModal.show()
+            }
+            // history 이용해서 모달창 보여준거에 대한 기록을 clear!
+            history.replaceState({}, null, null) //(state, unused, url)
+
+          }
+          function goRead(fno, page, type, keyword){
+            // 디버깅: 매개변수 값 출력
+            console.log('fno:', fno);
+            console.log('page:', page);
+            console.log('type:', type);
+            console.log('keyword:', keyword);
+            url = /*[[@{/feeds/read}]]*/'url'
+            location.href = url + `?fno=${fno}&page=${page}&type=${type}&keyword=${keyword}`
+          }
+  </script>
+  <!-- Footer-->
+  <footer class="py-5 bg-dark">
+    <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
+  </footer>
+
+  </body>
+  </th:block>
+</th:block>
+</html>

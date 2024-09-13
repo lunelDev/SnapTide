@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<h1>For Manager</h1>
+<div sec:authorize="hasRole('USER')">Has USER_ROLE</div>
+<div sec:authorize="hasRole('MANAGER')">Has USER_MANAGER</div>
+<div sec:authorize="hasRole('ADMIN')">Has USER_ADMIN</div>
+<br>
+<fieldset sec:authorize="isAuthenticated()">
+  <legend>Authenticated member can just see this page.</legend>
+  <div>
+    아래의 태그들은 로그인 되었을 때만 사용가능.<br>
+    Authenticated username : <span sec:authentication="name"></span><br>
+    Authenticated user's role : <span sec:authentication="principal.authorities"></span><br>
+  </div>
+</fieldset>
+</body>
+</html>

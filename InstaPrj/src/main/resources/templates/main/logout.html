@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<h1>Logout Page</h1>
+<p>커스텀 로그아웃 페이지 설정할 경우 form의 method는 post로 지정해야 한다.</p>
+<p>csrf를 같이 적용하는 경우에는 method는 반드시 post로 지정해야 한다.</p>
+<p>action 주소도 spring security의 logoutUrl()에 적용된 주소와 동일해야 함.</p>
+<p>csrf를 적용하지 않는 경우에는 get로 지정해도 로그아웃 된다.</p>
+<form method="post" th:action="@{/logout}">
+  <button>Logout</button>
+</form>
+</body>
+</html>

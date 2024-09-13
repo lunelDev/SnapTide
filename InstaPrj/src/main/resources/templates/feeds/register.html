@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/layout/basic :: setContent(~{this::content})}">
+  <th:block th:fragment="content">
+    <div class="m-5">
+      <h1 class="mt-4 text-primary fw-bold fs-2">Feed Register Page</h1>
+      <style>
+        .form-group {margin-bottom: 30px;}
+        .uploadResult {width: 100%;background:gray;margin-top:10px;}
+        .uploadResult ul {
+          display: flex;flex-flow:row;justify-content:center;
+          align-items:center;vertical-align:top;overflow: auto;
+        }
+        .uploadResult ul li {list-style:none;padding:10px;margin-left:2em;}
+        .uploadResult ul li img {width: 100px;}
+      </style>
+      <form th:action="@{/feeds/register}" th:method="post" id="frmSend">
+        <div class="form-group">
+          <label for="title" class="mt-4 fw-bold fs-4">Title</label>
+          <input type="text" name="title" id="title" class="form-control"
+                 placeholder="타이틀을 입력하세요">
+        </div>
+        <div>
+          <label for="fileInput"  class="fw-bold fs-4">Select Image Files</label>
+          <div class="form-group input-group mb-3">
+            <input type="file" id="fileInput" class="custom-file-input form-control files" multiple>
+            <label id="custom-label"></label>
+            <label type="submit" id="btnSend" class="input-group-text" for="fileInput">Submit</label>
+          </div>
+        </div>
+        <div class="box"></div> <!--submit 버튼을 누를 때 필요한 자료 두는 곳-->
+      </form>
+      <div class="uploadResult"><!--file의 onchange 후에 보여질 섬네일 보여주는 영역-->
+        <ul></ul>
+      </div>
+      <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+      <script th:inline="javascript">
+        function checkExtension(fileName, fileSize){
+          maxSize = 1024*1024*10;
+          if(fileSize >= maxSize) {alert("파일사이즈 초과");return false; }
+          // https://developer.mozilla.org/ko/docs/Web/JavaScript/Guide/Regular_expressions
+          //const regex = new RegExp("(.*?)\.(exe|sh|zip|alz|tiff)$");
+          const regex = new RegExp("(.*?)\.(jpg|jpeg|png|gif|bmp|pdf)$",'i');//i대소문자구분X
+          if(!regex.test(fileName)) {alert("해당파일 업로드 금지!");return false; }
+          return true
+        }
+        const fileInput = document.querySelector("#fileInput")
+        fileInput.onchange = function() {
+          let formData = new FormData();
+          const fileName = fileInput.value.split("\\").pop();
+<!--          let label = document.querySelector("#custom-label")-->
+<!--          label.innerHTML =-->
+<!--            (fileInput.files.length-1) == 0 ? "" :-->
+<!--                  `${fileName} 외 ${fileInput.files.length-1}개`-->
+          let appended = false; // 파일이 잘 추가되는지 확인
+          for(let i=0;i<fileInput.files.length;i++) {
+            if(!checkExtension(fileInput.files[i].name, fileInput.files.size)) {
+              label.innerHTML = ''; fileInput.value = '';
+              appended = false;break;
+            }
+            formData.append("uploadFiles", fileInput.files[i])
+            appended = true;
+          }
+          if(!appended) return;
+          for(const value of formData.values()) console.log(value)
+          const url = /*[[@{/uploadAjax}]]*/'url'
+          fetch(url, {
+            method: 'POST', body: formData, dataType: 'json'
+          })
+          .then(res => res.json())
+          .then(json => {console.log(json);showResult(json);})
+          .catch(err => console.log('Error: ', err))
+        }
+        function showResult(arr) {
+          const uploadUL = document.querySelector(".uploadResult ul");
+          let str = ""
+          const url = /*[[@{/display}]]*/'url'
+          for(let i=0;i<arr.length;i++){
+            str += `<li data-name='${arr[i].fileName}' data-path='${arr[i].folderPath}'
+            data-uuid='${arr[i].uuid}' data-file='${arr[i].imageURL}'><div>
+            <button class="removeBtn" type="button">X</button>
+            <img src="${url}?fileName=${arr[i].thumbnailURL}">
+            </div></li>`
+          }
+          uploadUL.innerHTML = str;
+          const removeBtns = document.querySelectorAll(".removeBtn");
+          for(let i=0;i<removeBtns.length;i++){
+            removeBtns[i].onclick = function() {
+              const removeUrl = /*[[@{/removeFile?fileName=}]]*/'removeUrl'
+              const targetLi = this.closest('li')
+              const fileName = targetLi.dataset.file;
+              /*fetch(removeUrl+fileName, {
+                method: 'POST', dataType: 'json', fileName: fileName
+              })
+              .then(response => response.json())
+              .then(json => {
+                console.log(json)
+                if(json === true) targetLi.remove()
+<!--                document.querySelector("#custom-label").innerHTML = ''-->
+                document.querySelector("#fileInput").value = '';
+              })
+              .catch(err => console.log("Error occurred: ", err))
+              */
+              axios({
+                method: "POST",
+                url: removeUrl+fileName,
+              }).then(res => {
+                if(res.data === true) targetLi.remove();
+<!--                document.querySelector("#custom-label").innerHTML = '';-->
+                document.querySelector("#fileInput").value = '';
+              }).catch(err => {
+                console.log(err);
+              });
+            }
+          }
+        }
+
+        btnSend = document.querySelector("#btnSend");
+        btnSend.onclick = function(e) {
+          e.preventDefault();
+          const title = document.getElementById("title")
+          if(title.value == "") {title.focus();return false;}
+          /*if(fileInput.files.length == 0) {
+            document.querySelector("#custom-label").innerHTML =
+              "파일을 선택하세요!"
+            fileInput.focus(); return false;
+          }*/
+          let str = "";
+          const liArr = document.querySelectorAll(".uploadResult ul li");
+          for(let i=0;i<liArr.length;i++){
+            str += `
+              <input type="hidden" name="photosDTOList[${i}].imgName" value="${liArr[i].dataset.name}">
+              <input type="hidden" name="photosDTOList[${i}].path" value="${liArr[i].dataset.path}">
+              <input type="hidden" name="photosDTOList[${i}].uuid" value="${liArr[i].dataset.uuid}">
+            `
+          }
+          document.querySelector(".box").innerHTML = str;
+          document.querySelector("#frmSend").submit();
+        }
+      </script>
+    </div>
+  </th:block>
+</th:block>
+</html>

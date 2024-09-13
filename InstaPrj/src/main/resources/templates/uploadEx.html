@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<input type="file" name="uploadFiles" multiple>
+<button class="uploadBtn">Upload</button>
+<div class="uploadResult"></div>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script th:inline="javascript">
+  window.onload = function(){
+    document.querySelector(".uploadBtn").onclick = function() {
+      var formData = new FormData();
+      const inputFiles = document.querySelector("input[type='file']");
+      var files = inputFiles.files;
+      for(let i=0;i<files.length;i++){
+        console.log(files[i])
+        formData.append("uploadFiles", files[i]);
+      }
+      const url = /*[[@{/uploadAjax}]]*/'url'
+
+      /*axios.post(url, formData, {
+        headers: {
+          "Content-Type" : "multipart/form-data",
+          "Access-Control-Allow-Origin" : "*",
+          "process-data" : false,
+          "content-type" : false,
+        }
+      })
+      .then(res => {console.log(res.data)})
+      .catch(err => console.log("Error occurred: ", err)) */
+
+      fetch(url, {
+        method: 'POST',
+        body: formData,
+        dataType: 'json',
+      })
+      .then(res => res.json())
+      .then(json => {console.log(json);showUploadedImages(json)})
+      .catch(err => console.log("Error occurred: ", err))
+
+    }
+  }
+  function showUploadedImages(arr) {
+    const uploadResultDiv = document.querySelector(".uploadResult")
+    let str = ""
+    const url = /*[[@{/display}]]*/'url'
+    for(let i=0;i<arr.length;i++){
+      str += `<div><img src="${url}?fileName=${arr[i].thumbnailURL}">
+      <button class="removeBtn" data-name='${arr[i].imageURL}'>X</button></div>`
+    }
+    uploadResultDiv.innerHTML = str;
+    const removeBtns = document.querySelectorAll(".removeBtn");
+    for(let i=0;i<removeBtns.length;i++){
+      removeBtns[i].onclick = function() {
+        const fileName = this.dataset.name;
+        const targetDiv = this.closest('div')
+        const removeUrl = /*[[@{/removeFile?fileName=}]]*/'removeUrl'
+        fetch(removeUrl+fileName, {
+          method: 'POST', dataType: 'json', fileName: fileName
+        })
+        .then(response => response.json())
+        .then(json => {
+          if(json === true) targetDiv.remove()
+        })
+        .catch(err => console.log("Error occurred: ", err))
+      }
+    }
+  }
+</script>
+
+</body>
+</html>
