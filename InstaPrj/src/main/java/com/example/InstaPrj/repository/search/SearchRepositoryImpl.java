@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 @Log4j2
 public class SearchRepositoryImpl extends QuerydslRepositorySupport
-    implements com.example.InstaPrj.repository.search.SearchRepository {
+    implements SearchRepository {
   public SearchRepositoryImpl() {
     super(Feeds.class);
   }

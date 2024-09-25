@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-				 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -93,7 +93,6 @@
 			<scope>test</scope>
 		</dependency>
 
-
 		<!-- https://mvnrepository.com/artifact/com.querydsl/querydsl-jpa -->
 		<!-- The major version was updated from 2.x.x -> 3.x.x,
      and jakarta was used instead of javax.-->
@@ -123,6 +122,7 @@
 			<artifactId>thumbnailator</artifactId>
 			<version>0.4.20</version>
 		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -139,6 +139,7 @@
 					</excludes>
 				</configuration>
 			</plugin>
+
 			<!-- querydsl setting :: com.mysema.maven -->
 			<plugin>
 				<groupId>com.mysema.maven</groupId>
@@ -156,6 +157,7 @@
 					</execution>
 				</executions>
 			</plugin>
+
 		</plugins>
 	</build>
 

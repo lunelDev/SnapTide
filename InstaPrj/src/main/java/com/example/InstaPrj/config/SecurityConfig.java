@@ -34,7 +34,6 @@ public class SecurityConfig {
       "/"
   };
 
-  //
   @Bean
   PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
@@ -56,7 +55,7 @@ public class SecurityConfig {
     httpSecurity.authorizeHttpRequests(
         auth -> auth
             .requestMatchers(AUTH_WHITElIST).permitAll()
-            //.requestMatchers("/sample/all").permitAll()
+            .requestMatchers("/sample/all").permitAll()
             .requestMatchers(new AntPathRequestMatcher("/auth/**")).permitAll()
             .requestMatchers(new AntPathRequestMatcher("/error/**")).permitAll()
             .requestMatchers("/sample/admin/**").hasRole("ADMIN")
@@ -150,31 +149,5 @@ public class SecurityConfig {
   public LogoutSuccessHandler getLogoutSuccessHandler() {
     return new CustomLogoutSuccessHandler();
   }
-
-  // InMemory 방식으로 UserDetailsService(인증 관리 객체) 사용
-  /*@Bean
-  public UserDetailsService userDetailsService() {
-    UserDetails user1 = User.builder()
-        .username("user1")
-        .password("$2a$10$XGw3jOo9mQSoij4/so.6H.BtSRWpgPze6ZWMuc7ntyFFWqVNbcmBe")
-        .roles("USER")
-        .build();
-    UserDetails manager = User.builder()
-        .username("manager")
-        .password("$2a$10$AEHcuzENZx7OLeA.s8e.t.CvhE/a/GZf.ZKTPEBIKLv8g03zChnD2")
-        .roles("MANAGER")
-        .build();
-    UserDetails admin = User.builder()
-        .username("admin")
-        .password(passwordEncoder().encode("1"))
-        .roles("ADMIN", "MANAGER")
-        .build();
-    List<UserDetails> list = new ArrayList<>();
-    list.add(user1);
-    list.add(manager);
-    list.add(admin);
-    return new InMemoryUserDetailsManager(list);
-
-  }*/
 
 }

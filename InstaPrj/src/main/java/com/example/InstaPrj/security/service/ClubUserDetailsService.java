@@ -1,6 +1,5 @@
 package com.example.InstaPrj.security.service;
 
-import com.example.InstaPrj.repository.MembersRepository;
 import com.example.InstaPrj.entity.Members;
 import com.example.InstaPrj.repository.MembersRepository;
 import com.example.InstaPrj.security.dto.ClubMemberAuthDTO;
