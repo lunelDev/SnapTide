@@ -23,8 +23,8 @@ class MembersRepositoryTests {
       Members members = Members.builder()
           .email("m" + i + "@a.a")
           .pw(passwordEncoder.encode("1"))
-          .name("name"+i)
           .nickname("member" + i)
+          .name("name" + i)
           .build();
       members.addMemberRole(MembersRole.USER);
       if(i>80) members.addMemberRole(MembersRole.MANAGER);

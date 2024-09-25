@@ -31,7 +31,7 @@ public class SecurityConfig {
 
   // 무조건 허용하는 url
   private static final String[] AUTH_WHITElIST = {
-      "/"
+      "/", "/members/join", "/members/login"
   };
 
   @Bean
@@ -55,7 +55,7 @@ public class SecurityConfig {
     httpSecurity.authorizeHttpRequests(
         auth -> auth
             .requestMatchers(AUTH_WHITElIST).permitAll()
-            .requestMatchers("/sample/all").permitAll()
+            //.requestMatchers("/sample/all").permitAll()
             .requestMatchers(new AntPathRequestMatcher("/auth/**")).permitAll()
             .requestMatchers(new AntPathRequestMatcher("/error/**")).permitAll()
             .requestMatchers("/sample/admin/**").hasRole("ADMIN")
@@ -70,9 +70,7 @@ public class SecurityConfig {
       @Override
       public void customize(FormLoginConfigurer<HttpSecurity> httpSecurityFormLoginConfigurer) {
         httpSecurityFormLoginConfigurer
-//            .loginPage("/sample/login")
-//            .loginProcessingUrl("/sample/login")
-//            .defaultSuccessUrl("/")
+            .loginPage("/members/login") // controller에도 추가해야 함.
             .successHandler(getAuthenticationSuccessHandler())
             .failureHandler(getAuthenticationFailureHandler());
       }

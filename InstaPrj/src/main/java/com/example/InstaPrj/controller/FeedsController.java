@@ -24,6 +24,12 @@ import java.util.List;
 public class FeedsController {
   private final FeedsService feedsService;
 
+  @GetMapping({"", "/", "/list"})
+  public String list(PageRequestDTO pageRequestDTO, Model model) {
+    model.addAttribute("pageResultDTO", feedsService.getList(pageRequestDTO));
+    return "/feeds/list";
+  }
+
   @GetMapping("/register")
   public void register() {
   }
@@ -35,20 +41,15 @@ public class FeedsController {
     return "redirect:/feeds/list";
   }
 
-  @GetMapping({"","/","/list"})
-  public String list(PageRequestDTO pageRequestDTO, Model model) {
-    model.addAttribute("pageResultDTO", feedsService.getList(pageRequestDTO));
-    return "/feeds/list";
-  }
-
   @GetMapping({"/read", "/modify"})
   public void getFeed(Long fno, PageRequestDTO pageRequestDTO, Model model) {
     FeedsDTO feedsDTO = feedsService.getFeeds(fno);
     typeKeywordInit(pageRequestDTO);
     model.addAttribute("feedsDTO", feedsDTO);
   }
+
   @PostMapping("/modify")
-  public String modify(FeedsDTO dto, RedirectAttributes ra, PageRequestDTO pageRequestDTO){
+  public String modify(FeedsDTO dto, RedirectAttributes ra, PageRequestDTO pageRequestDTO) {
     log.info("modify post... dto: " + dto);
     feedsService.modify(dto);
     typeKeywordInit(pageRequestDTO);
@@ -64,24 +65,24 @@ public class FeedsController {
   private String uploadPath;
 
   @PostMapping("/remove")
-  public String remove(Long fno, RedirectAttributes ra, PageRequestDTO pageRequestDTO){
+  public String remove(Long fno, RedirectAttributes ra, PageRequestDTO pageRequestDTO) {
     log.info("remove post... fno: " + fno);
     List<String> result = feedsService.removeWithReviewsAndPhotos(fno);
-    log.info("result>>"+result);
+    log.info("result>>" + result);
     result.forEach(fileName -> {
       try {
-        log.info("removeFile............"+fileName);
+        log.info("removeFile............" + fileName);
         String srcFileName = URLDecoder.decode(fileName, "UTF-8");
         File file = new File(uploadPath + File.separator + srcFileName);
         file.delete();
-        File thumb = new File(file.getParent(),"s_"+file.getName());
+        File thumb = new File(file.getParent(), "s_" + file.getName());
         thumb.delete();
       } catch (Exception e) {
-        log.info("remove file : "+e.getMessage());
+        log.info("remove file : " + e.getMessage());
       }
     });
-    if(feedsService.getList(pageRequestDTO).getDtoList().size() == 0 && pageRequestDTO.getPage() != 1) {
-      pageRequestDTO.setPage(pageRequestDTO.getPage()-1);
+    if (feedsService.getList(pageRequestDTO).getDtoList().size() == 0 && pageRequestDTO.getPage() != 1) {
+      pageRequestDTO.setPage(pageRequestDTO.getPage() - 1);
     }
     typeKeywordInit(pageRequestDTO);
     ra.addFlashAttribute("msg", fno + " 삭제");
@@ -90,7 +91,8 @@ public class FeedsController {
     ra.addAttribute("keyword", pageRequestDTO.getKeyword());
     return "redirect:/feeds/list";
   }
-  private void typeKeywordInit(PageRequestDTO pageRequestDTO){
+
+  private void typeKeywordInit(PageRequestDTO pageRequestDTO) {
     if (pageRequestDTO.getType().equals("null")) pageRequestDTO.setType("");
     if (pageRequestDTO.getKeyword().equals("null")) pageRequestDTO.setKeyword("");
   }
