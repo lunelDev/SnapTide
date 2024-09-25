@@ -22,6 +22,7 @@ import org.springframework.security.web.access.expression.WebExpressionAuthoriza
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -44,10 +45,11 @@ public class SecurityConfig {
   @Bean
   protected SecurityFilterChain config(HttpSecurity httpSecurity)
       throws Exception {
-    // csrf 사용안하는 설정
+    // csrf 사용안하는 설정 Cross-Site Request Forgery
     httpSecurity.csrf(httpSecurityCsrfConfigurer -> {
       httpSecurityCsrfConfigurer.disable();
     });
+//    httpSecurity.csrf((csrf)->csrf.csrfTokenRepository(new HttpSessionCsrfTokenRepository()));
 
     // authorizeHttpRequests :: 선별적으로 접속을 제한하는 메서드
     // 모든 페이지가 인증을 받도록 되어 있는 상태

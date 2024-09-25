@@ -66,11 +66,7 @@
         const url = /*[[@{/uploadAjax}]]*/'url'
         fetch(url, {
           method: 'POST',
-           headers: {
-           'Context-Type': 'application/json',
-           'X-CSRF-TOKEN': [[]]
-           }
-           body: formData, dataType: 'json'
+          body: formData, dataType: 'json'
         })
         .then(res => res.json())
         .then(json => {console.log(json);showResult(json);})
