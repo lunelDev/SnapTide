@@ -1,8 +1,6 @@
 package com.example.InstaPrj.dto;
 
 import lombok.Data;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -13,7 +11,6 @@ import java.util.stream.IntStream;
 
 @Data
 public class PageResultDTO<DTO, EN> {
-  private static final Logger log = LoggerFactory.getLogger(PageResultDTO.class);
   private List<DTO> dtoList; // 한 페이지의 목록
   private int totalPage; //총페이지수 10개
   private int page; // 현재 페이지
@@ -39,8 +36,5 @@ public class PageResultDTO<DTO, EN> {
     next = totalPage > tempEnd;
     pageList = //페이지 번호 목록
         IntStream.rangeClosed(start, end).boxed().collect(Collectors.toList());
-
-    log.info("dtoList :"+dtoList.toString());
-
   }
 }

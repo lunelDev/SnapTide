@@ -18,287 +18,298 @@
 </style>
 <th:block th:replace="~{/layout/basic :: setContent(~{this::content})}">
   <th:block th:fragment="content">
-    <div class="m-5">
-      <h1 class="mt-4 text-primary fw-bold fs-2">Feeds Content</h1>
-      <form th:action="@{/feeds/modify}" th:method="post" id="frmSend">
-        <div class="form-group">
-          <label for="fno" class="mt-4 fw-bold fs-4">FNO</label>
-          <input type="text" name="fno" id="fno" class="form-control"
-                 th:value="${feedsDTO.fno}" readonly>
-        </div>
-        <div class="form-group">
-          <label for="title" class="mt-4 fw-bold fs-4">Title</label>
-          <input type="text" name="title" id="title" class="form-control"
-                 th:value="${feedsDTO.title}" readonly>
-        </div>
-        <div class="form-group">
-          <label for="reviewsCnt" class="mt-4 fw-bold fs-4">Review Count</label>
-          <input type="text" name="reviewsCnt" id="reviewsCnt" class="form-control"
-                 th:value="${feedsDTO.reviewsCnt}" readonly></input>
-        </div>
-        <div class="form-group">
-          <label for="regDate" class="mt-4 fw-bold fs-4">RegDate</label>
-          <input type="text" name="regDate" id="regDate" class="form-control" readonly
-                 th:value="${#temporals.format(feedsDTO.regDate, 'yyyy/MM/dd hh:mm')}">
-        </div>
-        <div class="form-group">
-          <label for="modDate" class="mt-4 fw-bold fs-4">ModDate</label>
-          <input type="text" name="modDate" id="modDate" class="form-control" readonly
-                 th:value="${#temporals.format(feedsDTO.modDate, 'yyyy/MM/dd hh:mm')}">
-        </div>
-        <div class="uploadResult">
-          <ul>
-            <li th:each="photosDTO : ${feedsDTO.photosDTOList}"
-                th:data-file="${photosDTO.getThumbnailURL}" style="cursor:pointer;">
-              <img
-                      th:if="${photosDTO.path != null}"
-                      th:src="|@{/display(fileName=${photosDTO.getThumbnailURL})}|">
-            </li>
-          </ul>
-        </div>
-        <div class="form-group">
-          <a th:href="@{/feeds/modify(fno=${feedsDTO.fno},
+    <h2 class="mt-4">Feed Read Page</h2>
+    <form th:action="@{/feeds/modify}" th:method="post" id="frmSend">
+      <div class="form-group">
+        <label for="fno">Mno</label>
+        <input type="text" name="fno" id="fno" class="form-control"
+               th:value="${feedsDTO.fno}" readonly>
+      </div>
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" name="title" id="title" class="form-control"
+               th:value="${feedsDTO.title}" readonly>
+      </div>
+      <div class="form-group">
+        <label for="reviewsCnt">Review Count</label>
+        <input type="text" name="reviewsCnt" id="reviewsCnt" class="form-control"
+               th:value="${feedsDTO.reviewsCnt}" readonly></input>
+      </div>
+      <div class="form-group">
+        <label for="likes">Average</label>
+        <input type="text" name="likes" id="likes" class="form-control"
+               th:value="${feedsDTO.likes}" readonly></input>
+      </div>
+      <div class="form-group">
+        <label for="regDate">RegDate</label>
+        <input type="text" name="regDate" id="regDate" class="form-control" readonly
+               th:value="${#temporals.format(feedsDTO.regDate, 'yyyy/MM/dd hh:mm')}">
+      </div>
+      <div class="form-group">
+        <label for="modDate">ModDate</label>
+        <input type="text" name="modDate" id="modDate" class="form-control" readonly
+               th:value="${#temporals.format(feedsDTO.modDate, 'yyyy/MM/dd hh:mm')}">
+      </div>
+      <div class="uploadResult">
+        <ul>
+          <li th:each="photosDTO : ${feedsDTO.photosDTOList}"
+              th:data-file="${photosDTO.getThumbnailURL}" style="cursor:pointer;">
+            <img
+                th:if="${photosDTO.path != null}"
+                th:src="|@{/display(fileName=${photosDTO.getThumbnailURL})}|">
+          </li>
+        </ul>
+      </div>
+      <div class="form-group">
+        <a th:href="@{/feeds/modify(fno=${feedsDTO.fno},
                       page=${pageRequestDTO.page},type=${pageRequestDTO.type},
                       keyword=${pageRequestDTO.keyword})}"
-             class="btn btn-primary">Modify</a>
-          <a th:href="@{/feeds/list(page=${pageRequestDTO.page},
+           class="btn btn-primary">Modify</a>
+        <a th:href="@{/feeds/list(page=${pageRequestDTO.page},
                       type=${pageRequestDTO.type},keyword=${pageRequestDTO.keyword})}"
-             class="btn btn-info">List</a>
-        </div>
-      </form>
-      <!--리뷰 등록 관련-->
-      <div>
-        <div class="mt-4">
-          <h5>
-            <span class="btn btn-outline-secondary addReview">Add Review</span>
-            <span style="font-size:9pt">Review :
+           class="btn btn-info">List</a>
+      </div>
+    </form>
+    <div>
+      <div class="mt-4">
+        <h5>
+          <span class="btn btn-outline-secondary addReview">Add Review</span>
+          <span style="font-size:9pt">Review :
             <span id="revCnt" th:text="${feedsDTO.reviewsCnt}"></span> 개
           </span>
-          </h5>
-        </div>
-        <div class="list-group reviewsList" style="margin-bottom:50px;"></div>
+        </h5>
       </div>
-      <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
-            </div>
+      <div class="list-group reviewList" style="margin-bottom:50px;"></div>
+    </div>
+    <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
           </div>
         </div>
       </div>
-      <script th:inline="javascript">
-        // window.onload : document의 태그를 모두 읽고 난뒤 실행되는 함수
-        window.onload = function(){
-          var fno = [[${feedsDTO.fno}]]
-          loadReviewJSON();
-          const uploadResultUlLis = document.querySelectorAll(".uploadResult ul li");
-          for(let i=0;i<uploadResultUlLis.length;i++){
-            uploadResultUlLis[i].onclick = function () {
-              const url = /*[[@{/display}]]*/'url'
-              const file = this.dataset.file;
-              document.querySelector("#exampleModalLabel").textContent = 'Feeds Poster'
-              document.querySelector(".modal-body").innerHTML =
-                `<img style="width:100%" src="${url}?fileName=${file}&size=1">`
-              document.querySelector(".modal-footer").innerHTML =
-                `<span class="btn btn-secondary" data-bs-dismiss="modal">Close</span>`
-              myModal.show()
-            }
-          }
-          var myModal = new bootstrap.Modal(document.querySelector('#myModal'),
-                            { backdrop: true });
+    </div>
+    <script th:inline="javascript">
+      // 별점 처리
+      function drawStar(target) {
+        document.querySelector('.star span').style.width = `${target.value * 10}%`;
+      }
 
-          // Ajax로 리뷰 불러오기
-          function loadReviewJSON() {
-            const url = /*[[@{/reviews/}]]*/'url'
-            const listGroup = document.querySelector(".reviewsList")
-            fetch(url+fno+"/all", {method: 'GET',})
-            .then(response => response.json())
-            .then(data => {
-              // console.log(data)
-              let str = "";
-              for(let i=0;i<data.length;i++) {
-                str = str + `<div class="card-body form-control mb-1"
-                onmouseover="this.style.background='#d6e6ff'"
-                onmouseout="this.style.background='white'"
-                data-mid="${data[i].mid}" data-text="${data[i].text}"
-                data-nickname="${data[i].nickname}"
-                data-email="${data[i].email}" data-reviewsnum="${data[i].reviewsnum}"
-                style="padding: 5px 20px;cursor:pointer;">
-                  <div style="display:inline-block;width:68%;">
-                    <h6 style="display:inline-block;width:70px">${data[i].reviewsnum}</h6>
-                    <h5 class="card-text" style="display:inline-block;">${data[i].text}
-
-                  </div>
-                  <div style="display:inline-block;width:30%;text-align: right;right-padding:12px;">
-                    <span class="card-subtitle text-muted" style="font-size:10px">${data[i].nickname} /
-                     ${data[i].email}</span>
-                    <span class="card-subtitle text-muted"
-                    style="display:inline-block;width:150px;color:rgb(148 163 184);font-size:12px;"
-                    >${formatDateTime(data[i].regDate)}</span>
-                  </div>
-                </div>`
-              }
-              listGroup.innerHTML = str
-              const cardBody = document.querySelectorAll(".card-body")
-              for(let i=0;i<cardBody.length;i++) {
-                // 리뷰 상세보기
-                cardBody[i].onclick = function() {
-                  let reviewsnum = cardBody[i].dataset.reviewsnum;
-                  let text = cardBody[i].dataset.text;
-                  let mid = cardBody[i].dataset.mid;
-
-                  let nickname = cardBody[i].dataset.nickname;
-                  document.querySelector('#exampleModalLabel').textContent='No '+reviewsnum
-                  document.querySelector(".modal-body").innerHTML =
-                    `<input type="hidden" name="reviewsnum" value="${reviewsnum}" readonly>
-                     <input type="hidden" name="mid" value="${mid}" readonly>
-
-                     <input type="range" oninput="drawStar(this)" value="1" step="2" min="0" max="10">
-                     </span><br>
-                     <input type="text" class="form-control" name="text" value="${text}">
-                    `
-                  document.querySelector(".modal-footer").innerHTML =
-                    `<button type="button" class="btn btn-danger remove">리뷰 삭제</button>
-                     <button type="button" class="btn btn-warning modify">리뷰 수정</button>
-                     <span class="btn btn-secondary" data-bs-dismiss="modal">Close</span>
-                    `
-                  document.querySelector(".modal-footer .modify").onclick = function () {
-                    let reviewsnum = document.querySelector(".modal-body input[name='reviewsnum']")
-                    let text = document.querySelector(".modal-body input[name='text']")
-                    let mid = document.querySelector(".modal-body input[name='mid']")
-
-                    let notice = document.querySelector('#notice')
-
-                    if(!text.value) {
-                      text.setAttribute('placeholder','댓글입력하세요');text.focus();return;}
-
-                    let reviews = {fno: fno, text: text.value, mid: mid.value
-                                   , reviewsnum: reviewsnum.value}
-                    const url = /*[[@{/reviews/}]]*/'url';
-                    fetch(url+fno+"/"+reviewsnum.value, {
-                      method: 'PUT',
-                      headers: {'Content-type': 'application/json'},
-                      body: JSON.stringify(reviews)
-                    })
-                    .then(res => res.json())
-                    .then(function(data){
-                      document.querySelector("#exampleModalLabel").innerHTML=`수정 알림`
-                      document.querySelector(".modal-body").innerHTML=`${data}번 댓글 수정 완료.`
-                      document.querySelector(".modal-footer .modify").style.display = 'none'
-                      document.querySelector(".modal-footer .remove").style.display = 'none'
-                      loadReviewJSON()
-                    })
-                    .catch(err => console.log('myError', err))
-                  }
-                  document.querySelector(".modal-footer .remove").onclick = function () {
-                    let reviewsnum = document.querySelector(
-                      ".modal-body input[name='reviewsnum']")
-                    const url = /*[[@{/reviews/}]]*/'url';
-                    fetch(url + fno + "/" + reviewsnum.value, {
-                      method: 'DELETE',
-                      headers: {'Content-type': 'application/json'},
-                    })
-                    .then(res => res.json())
-                    .then(async function(data){
-                      document.querySelector("#exampleModalLabel").innerHTML=`삭제 알림`
-                      document.querySelector(".modal-body").innerHTML=`${data}번 댓글 삭제 완료.`
-                      document.querySelector(".modal-footer .modify").style.display = 'none'
-                      document.querySelector(".modal-footer .remove").style.display = 'none'
-                      document.querySelector("#revCnt").textContent =
-                        parseInt(document.querySelector("#revCnt").textContent) - 1
-                      loadReviewJSON()
-                    })
-                    .catch(err => console.log('myError', err))
-                  }
-
-                  myModal.show()
-                }
-              }
-            });
-          }
-
-          // 날짜 형식 맞춤 함수
-          function formatDateTime(str) {
-            const date = new Date(str)
-            return `${date.getFullYear()}/${len2(date.getMonth()+1)}`
-               + `/${len2(date.getDate())} ${len2(date.getHours())}:`
-               + `${len2(date.getMinutes())}`
-          }
-          // 2자리 숫자 채움 함수
-          function len2(num) {
-            return (num<10) ? "0"+num : num;
-          }
-
-          // 리뷰 추가하기
-          document.querySelector('.addReview').onclick = function() {
-            document.querySelector('#exampleModalLabel').textContent = '리뷰 추가'
+      // window.onload : document의 태그를 모두 읽고 난뒤 실행되는 함수
+      window.onload = function(){
+        var fno = [[${feedsDTO.fno}]]
+        loadReviewJSON();
+        const uploadResultUlLis = document.querySelectorAll(".uploadResult ul li");
+        for(let i=0;i<uploadResultUlLis.length;i++){
+          uploadResultUlLis[i].onclick = function () {
+            const url = /*[[@{/display}]]*/'url'
+            const file = this.dataset.file;
+            document.querySelector("#exampleModalLabel").textContent = 'Feeds Poster'
             document.querySelector(".modal-body").innerHTML =
-              `
-              <input type="text" class="form-control" name="mid" placeholder="Member ID(mid)">
-              <label id="notice">Grade</label> <span class="star">★★★★★<span>★★★★★</span>
-                     <input type="range" oninput="drawStar(this)" value="1" step="2" min="0" max="10">
-                     </span><br>
-              <input type="text" class="form-control" name="text" placeholder="Review Text...">
-              `
+              `<img style="width:100%" src="${url}?fileName=${file}&size=1">`
             document.querySelector(".modal-footer").innerHTML =
-              `
-                <button type="button" class="btn btn-primary save">댓글 등록</button>
-                <span class="btn btn-secondary" data-bs-dismiss="modal">Close</span>
-              `
-            // 모달창에서 댓글 추가하기 버튼 처리
-            document.querySelector(".modal-footer .save").onclick = function () {
-              let mid = document.querySelector(".modal-body input[name='mid']")
-              let text = document.querySelector(".modal-body input[name='text']")
-              let notice = document.querySelector('#notice')
-
-              if(!text.value) {
-                text.setAttribute('placeholder','댓글입력하세요');text.focus();return;}
-              if(!mid.value) {
-                mid.setAttribute('placeholder','회원번호를 입력하세요');mid.focus();return;}
-
-              let reviews = {fno: fno, text: text.value, mid: mid.value}
-              const url = /*[[@{/reviews/}]]*/'url';
-              fetch(url+fno, {
-                method: 'POST',
-                headers: {'Content-type': 'application/json'},
-                body: JSON.stringify(reviews)
-              })
-              .then(res => res.json())
-              .then(function(data){
-                document.querySelector(".modal-body").innerHTML=`${data}번 리뷰 등록 완료.`
-                document.querySelector("#exampleModalLabel").innerHTML=`등록 알림`
-                document.querySelector(".modal-footer .save").style.display = 'none'
-                document.querySelector("#revCnt").textContent =
-                  parseInt(document.querySelector("#revCnt").textContent) + 1
-                loadReviewJSON()
-              })
-            }
-            myModal.show()
-          }
-
-          var msg = [[${msg}]]
-
-          // 일회성 msg의 내용이 비거나 history 상태가 비지 않는 경우 return
-          if(msg === '' || history.state) return
-          // history 이용해서 모달창 보여준거에 대한 기록을 clear!
-          history.replaceState({}, null, null) //(state, unused, url)
-
-          if(msg) {  // truthy 데이터가 올 경우만 if문 실행
-            document.querySelector(".modal-body").innerHTML
-              = `<p>${msg}되었습니다.</p>`
+              `<span class="btn btn-secondary" data-bs-dismiss="modal">Close</span>`
             myModal.show()
           }
         }
-      </script>
-    </div>
+        var myModal = new bootstrap.Modal(document.querySelector('#myModal'),
+                          { backdrop: true });
+
+        // Ajax로 리뷰 불러오기
+        function loadReviewJSON() {
+          const url = /*[[@{/reviews/}]]*/'url'
+          const listGroup = document.querySelector(".reviewList")
+          fetch(url+fno+"/all", {method: 'GET',})
+          .then(response => response.json())
+          .then(data => {
+            // console.log(data)
+            let str = "";
+            for(let i=0;i<data.length;i++) {
+              str = str + `<div class="card-body form-control mb-1"
+              onmouseover="this.style.background='#d6e6ff'"
+              onmouseout="this.style.background='white'"
+              data-mid="${data[i].mid}" data-text="${data[i].text}"
+              data-likes="${data[i].likes}" data-nickname="${data[i].nickname}"
+              data-email="${data[i].email}" data-reviewsnum="${data[i].reviewsnum}"
+              style="padding: 5px 20px;cursor:pointer;">
+                <div style="display:inline-block;width:68%;">
+                  <h6 style="display:inline-block;width:70px">${data[i].reviewsnum}</h6>
+                  <h5 class="card-text" style="display:inline-block;">${data[i].text}
+                  [★ ${data[i].likes}]</h5>
+                </div>
+                <div style="display:inline-block;width:30%;text-align: right;right-padding:12px;">
+                  <span class="card-subtitle text-muted" style="font-size:10px">${data[i].nickname} /
+                   ${data[i].email}</span>
+                  <span class="card-subtitle text-muted"
+                  style="display:inline-block;width:150px;color:rgb(148 163 184);font-size:12px;"
+                  >${formatDateTime(data[i].regDate)}</span>
+                </div>
+              </div>`
+            }
+            listGroup.innerHTML = str
+            const cardBody = document.querySelectorAll(".card-body")
+            for(let i=0;i<cardBody.length;i++) {
+              // 리뷰 상세보기
+              cardBody[i].onclick = function() {
+                let reviewsnum = cardBody[i].dataset.reviewsnum;
+                let text = cardBody[i].dataset.text;
+                let mid = cardBody[i].dataset.mid;
+                let likes = cardBody[i].dataset.likes;
+                let nickname = cardBody[i].dataset.nickname;
+                document.querySelector('#exampleModalLabel').textContent='No '+reviewsnum
+                document.querySelector(".modal-body").innerHTML =
+                  `<input type="hidden" name="reviewsnum" value="${reviewsnum}" readonly>
+                   <input type="hidden" name="mid" value="${mid}" readonly>
+                   <label id="notice">Grade</label><span class="star">★★★★★<span>★★★★★</span>
+                   <input type="range" oninput="drawStar(this)" value="1" step="2" min="0" max="10">
+                   </span><br>
+                   <input type="text" class="form-control" name="text" value="${text}">
+                  `
+                document.querySelector(".modal-footer").innerHTML =
+                  `<button type="button" class="btn btn-danger remove">리뷰 삭제</button>
+                   <button type="button" class="btn btn-warning modify">리뷰 수정</button>
+                   <span class="btn btn-secondary" data-bs-dismiss="modal">Close</span>
+                  `
+                document.querySelector(".modal-footer .modify").onclick = function () {
+                  let reviewsnum = document.querySelector(".modal-body input[name='reviewsnum']")
+                  let text = document.querySelector(".modal-body input[name='text']")
+                  let mid = document.querySelector(".modal-body input[name='mid']")
+                  let likes = parseFloat(document.querySelector(".star span").style.width)*0.01*5;
+                  let notice = document.querySelector('#notice')
+
+                  if(!text.value) {
+                    text.setAttribute('placeholder','댓글입력하세요');text.focus();return;}
+                  if(!likes) {notice.textContent='Select Grade!'; return;}
+                  let reviews = {fno: fno, text: text.value, mid: mid.value
+                                  , likes: likes, reviewsnum: reviewsnum.value}
+                  const url = /*[[@{/reviews/}]]*/'url';
+                  fetch(url+fno+"/"+reviewsnum.value, {
+                    method: 'PUT',
+                    headers: {'Content-type': 'application/json'},
+                    body: JSON.stringify(reviews)
+                  })
+                  .then(res => res.json())
+                  .then(function(data){
+                    document.querySelector("#exampleModalLabel").innerHTML=`수정 알림`
+                    document.querySelector(".modal-body").innerHTML=`${data}번 댓글 수정 완료.`
+                    document.querySelector(".modal-footer .modify").style.display = 'none'
+                    document.querySelector(".modal-footer .remove").style.display = 'none'
+                    loadReviewJSON()
+                  })
+                  .catch(err => console.log('myError', err))
+                }
+                document.querySelector(".modal-footer .remove").onclick = function () {
+                  let reviewsnum = document.querySelector(
+                    ".modal-body input[name='reviewsnum']")
+                  const url = /*[[@{/reviews/}]]*/'url';
+                  fetch(url + fno + "/" + reviewsnum.value, {
+                    method: 'DELETE',
+                    headers: {'Content-type': 'application/json'},
+                  })
+                  .then(res => res.json())
+                  .then(async function(data){
+                    document.querySelector("#exampleModalLabel").innerHTML=`삭제 알림`
+                    document.querySelector(".modal-body").innerHTML=`${data}번 댓글 삭제 완료.`
+                    document.querySelector(".modal-footer .modify").style.display = 'none'
+                    document.querySelector(".modal-footer .remove").style.display = 'none'
+                    document.querySelector("#revCnt").textContent =
+                      parseInt(document.querySelector("#revCnt").textContent) - 1
+                    loadReviewJSON()
+                  })
+                  .catch(err => console.log('myError', err))
+                }
+                document.querySelector('.star span').style.width = `${likes * 20}%`
+                myModal.show()
+              }
+            }
+          });
+        }
+
+        // 날짜 형식 맞춤 함수
+        function formatDateTime(str) {
+          const date = new Date(str)
+          return `${date.getFullYear()}/${len2(date.getMonth()+1)}`
+             + `/${len2(date.getDate())} ${len2(date.getHours())}:`
+             + `${len2(date.getMinutes())}`
+        }
+        // 2자리 숫자 채움 함수
+        function len2(num) {
+          return (num<10) ? "0"+num : num;
+        }
+
+        // 리뷰 추가하기
+        document.querySelector('.addReview').onclick = function() {
+          document.querySelector('#exampleModalLabel').textContent = '리뷰 추가'
+          document.querySelector(".modal-body").innerHTML =
+            `
+            <input type="text" class="form-control" name="mid" placeholder="Member ID(mid)">
+            <label id="notice">Grade</label> <span class="star">★★★★★<span>★★★★★</span>
+                   <input type="range" oninput="drawStar(this)" value="1" step="2" min="0" max="10">
+                   </span><br>
+            <input type="text" class="form-control" name="text" placeholder="Review Text...">
+            `
+          document.querySelector(".modal-footer").innerHTML =
+            `
+              <button type="button" class="btn btn-primary save">댓글 등록</button>
+              <span class="btn btn-secondary" data-bs-dismiss="modal">Close</span>
+            `
+          // 모달창에서 댓글 추가하기 버튼 처리
+          document.querySelector(".modal-footer .save").onclick = function () {
+            let mid = document.querySelector(".modal-body input[name='mid']")
+            let text = document.querySelector(".modal-body input[name='text']")
+            let likes = parseFloat(document.querySelector(".star span").style.width)*0.01*5;
+            let notice = document.querySelector('#notice')
+
+            if(!text.value) {
+              text.setAttribute('placeholder','댓글입력하세요');text.focus();return;}
+            if(!mid.value) {
+              mid.setAttribute('placeholder','회원번호를 입력하세요');mid.focus();return;}
+            if(!likes) {notice.textContent='Select Grade!'; return;}
+            let reviews = {fno: fno, text: text.value, mid: mid.value, likes: likes}
+            const url = /*[[@{/reviews/}]]*/'url';
+            fetch(url+fno, {
+              method: 'POST',
+              headers: {'Content-type': 'application/json'},
+              body: JSON.stringify(reviews)
+            })
+            .then(res => res.json())
+            .then(function(data){
+              document.querySelector(".modal-body").innerHTML=`${data}번 리뷰 등록 완료.`
+              document.querySelector("#exampleModalLabel").innerHTML=`등록 알림`
+              document.querySelector(".modal-footer .save").style.display = 'none'
+              document.querySelector("#revCnt").textContent =
+                parseInt(document.querySelector("#revCnt").textContent) + 1
+              loadReviewJSON()
+            })
+          }
+          myModal.show()
+        }
+
+        var msg = [[${msg}]]
+
+        // 일회성 msg의 내용이 비거나 history 상태가 비지 않는 경우 return
+        if(msg === '' || history.state) return
+        // history 이용해서 모달창 보여준거에 대한 기록을 clear!
+        history.replaceState({}, null, null) //(state, unused, url)
+
+        if(msg) {  // truthy 데이터가 올 경우만 if문 실행
+          document.querySelector(".modal-body").innerHTML
+            = `<p>${msg}되었습니다.</p>`
+          myModal.show()
+        }
+      }
+
+    </script>
   </th:block>
+
 </th:block>
+
 </html>

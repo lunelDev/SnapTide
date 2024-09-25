@@ -13,10 +13,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ReviewsDTO {
   private Long reviewsnum;
-  private Long fno; // Movie
+  private Long fno; // Feeds
   private Long mid; // Member
   private String nickname;
   private String email;
+  private int likes;
   private String text;
   private LocalDateTime regDate, modDate;
 }

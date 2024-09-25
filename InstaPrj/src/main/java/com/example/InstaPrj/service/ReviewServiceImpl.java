@@ -4,7 +4,6 @@ import com.example.InstaPrj.dto.ReviewsDTO;
 import com.example.InstaPrj.entity.Feeds;
 import com.example.InstaPrj.entity.Reviews;
 import com.example.InstaPrj.repository.ReviewsRepository;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,7 @@ import java.util.stream.Collectors;
 @Service
 @Log4j2
 @RequiredArgsConstructor
-public class ReviewsServiceImpl implements ReviewsService {
+public class ReviewServiceImpl implements ReviewService {
   private final ReviewsRepository reviewsRepository;
 
   @Override
@@ -28,7 +27,7 @@ public class ReviewsServiceImpl implements ReviewsService {
 
   @Override
   public Long register(ReviewsDTO reviewsDTO) {
-    log.info("reviewsDTO >> ",reviewsDTO);
+    log.info("reviewsDTO >> ", reviewsDTO);
     Reviews reviews = dtoToEntity(reviewsDTO);
     reviewsRepository.save(reviews);
     return reviews.getReviewsnum();
@@ -39,13 +38,14 @@ public class ReviewsServiceImpl implements ReviewsService {
     Optional<Reviews> result = reviewsRepository.findById(reviewsDTO.getReviewsnum());
     if (result.isPresent()) {
       Reviews reviews = result.get();
+      reviews.changeGrade(reviewsDTO.getLikes());
       reviews.changeText(reviewsDTO.getText());
       reviewsRepository.save(reviews);
     }
   }
 
   @Override
-  public void remove(Long reviewnum) {
-    reviewsRepository.deleteById(reviewnum);
+  public void remove(Long reviewsnum) {
+    reviewsRepository.deleteById(reviewsnum);
   }
 }

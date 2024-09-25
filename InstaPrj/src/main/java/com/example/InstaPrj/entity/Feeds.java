@@ -1,6 +1,9 @@
 package com.example.InstaPrj.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.*;
 
 @Entity
@@ -13,12 +16,9 @@ public class Feeds extends BasicEntity{
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long fno;
-  private String title;
-  private String content;
 
+  private String title;
   public void changeTitle(String title) {
     this.title = title;
   }
-  public void changeContent(String content) {this.content = content;}
-
 }

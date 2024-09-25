@@ -1,6 +1,6 @@
 package com.example.InstaPrj.repository.search;
-import com.example.InstaPrj.entity.Feeds;
 
+import com.example.InstaPrj.entity.Feeds;
 import com.example.InstaPrj.entity.QFeeds;
 import com.example.InstaPrj.entity.QPhotos;
 import com.example.InstaPrj.entity.QReviews;
@@ -23,10 +23,34 @@ import java.util.stream.Collectors;
 
 @Log4j2
 public class SearchRepositoryImpl extends QuerydslRepositorySupport
-    implements SearchRepository {
+    implements com.example.InstaPrj.repository.search.SearchRepository {
   public SearchRepositoryImpl() {
     super(Feeds.class);
   }
+
+//  @Override
+//  public Feeds search1() {
+//    log.info("search1.................");
+//    QFeeds feeds = QFeeds.feeds;
+//    QPhotos photos = QPhotos.photos;
+//    QReviews reviews = QReviews.reviews;
+//
+//    JPQLQuery<Feeds> jpqlQuery = from(feeds);
+//    jpqlQuery.leftJoin(photos).on(photos.feeds.eq(feeds));
+//    jpqlQuery.leftJoin(reviews).on(reviews.feeds.eq(feeds));
+//
+//    JPQLQuery<Tuple> tuple = jpqlQuery.select(feeds, photos.feeds, reviews.count());
+//    tuple.groupBy(feeds);
+//
+//    log.info("==========================");
+//    log.info(tuple);
+//    log.info("==========================");
+//
+//    List<Tuple> result = tuple.fetch();
+//    log.info("result: " + result);
+//
+//    return null;
+//  }
 
   @Override
   public Page<Object[]> searchPage(String type, String keyword, Pageable pageable) {
@@ -42,7 +66,7 @@ public class SearchRepositoryImpl extends QuerydslRepositorySupport
     jpqlQuery.leftJoin(reviews).on(reviews.feeds.eq(feeds));
 
     //3) Tuple생성 : 조인을 한 결과의 데이터를 tuple로 생성
-    JPQLQuery<Tuple> tuple = jpqlQuery.select(feeds, photos,reviews.count());
+    JPQLQuery<Tuple> tuple = jpqlQuery.select(feeds, photos, reviews.likes.count(),reviews.count());
 
     //4) 조건절 생성
     BooleanBuilder booleanBuilder = new BooleanBuilder();
@@ -58,7 +82,7 @@ public class SearchRepositoryImpl extends QuerydslRepositorySupport
           case "t":
             conditionBuilder.or(feeds.title.contains(keyword)); break;
           case "w":
-            conditionBuilder.or(reviews.clubMember.email.contains(keyword)); break;
+            conditionBuilder.or(reviews.members.email.contains(keyword)); break;
           case "c":
             conditionBuilder.or(reviews.text.contains(keyword)); break;
         }

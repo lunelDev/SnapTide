@@ -1,12 +1,11 @@
 package com.example.InstaPrj.service;
 
 import com.example.InstaPrj.dto.FeedsDTO;
+import com.example.InstaPrj.dto.PhotosDTO;
 import com.example.InstaPrj.dto.PageRequestDTO;
 import com.example.InstaPrj.dto.PageResultDTO;
-import com.example.InstaPrj.dto.PhotosDTO;
 import com.example.InstaPrj.entity.Feeds;
 import com.example.InstaPrj.entity.Photos;
-import lombok.extern.flogger.Flogger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,12 +27,10 @@ public interface FeedsService {
 
   void removeUuid(String uuid);
 
-
   default Map<String, Object> dtoToEntity(FeedsDTO feedsDTO) {
     Map<String, Object> entityMap = new HashMap<>();
     Feeds feeds = Feeds.builder().fno(feedsDTO.getFno())
-        .title(feedsDTO.getTitle())
-        .content(feedsDTO.getContent()).build();
+        .title(feedsDTO.getTitle()).build();
     entityMap.put("feeds", feeds);
     List<PhotosDTO> photosDTOList = feedsDTO.getPhotosDTOList();
     if (photosDTOList != null && photosDTOList.size() > 0) {
@@ -43,13 +40,12 @@ public interface FeedsService {
             public Photos apply(PhotosDTO photosDTO) {
               Photos photos = Photos.builder()
                   .path(photosDTO.getPath())
-                  .imgName(photosDTO.getImgName())
+                  .photosName(photosDTO.getPhotosName())
                   .uuid(photosDTO.getUuid())
                   .feeds(feeds)
                   .build();
               return photos;
             }
-
           }
       ).collect(Collectors.toList());
       entityMap.put("photosList", photosList);
@@ -58,20 +54,19 @@ public interface FeedsService {
   }
 
   default FeedsDTO entityToDto(Feeds feeds, List<Photos> photosList
-      , Long reviewsCnt) {
+      , Long likes, Long reviewsCnt) {
     FeedsDTO feedsDTO = FeedsDTO.builder()
         .fno(feeds.getFno())
         .title(feeds.getTitle())
-        .content(feeds.getContent())
         .regDate(feeds.getRegDate())
         .modDate(feeds.getModDate())
         .build();
     List<PhotosDTO> photosDTOList = new ArrayList<>();
     if(photosList.toArray().length > 0 && photosList.toArray()[0] != null) {
-      photosDTOList = photosDTOList.stream().map(
+      photosDTOList = photosList.stream().map(
           photos -> {
             PhotosDTO photosDTO = PhotosDTO.builder()
-                .imgName(photos.getImgName())
+                .photosName(photos.getPhotosName())
                 .path(photos.getPath())
                 .uuid(photos.getUuid())
                 .build();
@@ -80,6 +75,7 @@ public interface FeedsService {
       ).collect(Collectors.toList());
     }
     feedsDTO.setPhotosDTOList(photosDTOList);
+    feedsDTO.setLikes(likes);
     feedsDTO.setReviewsCnt(reviewsCnt);
     return feedsDTO;
   }

@@ -1,7 +1,6 @@
 package com.example.InstaPrj.controller;
 
 import com.example.InstaPrj.dto.UploadResultDTO;
-import com.example.InstaPrj.entity.Photos;
 import com.example.InstaPrj.repository.PhotosRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

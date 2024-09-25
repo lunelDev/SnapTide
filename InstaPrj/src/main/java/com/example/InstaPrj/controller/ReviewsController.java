@@ -1,6 +1,7 @@
 package com.example.InstaPrj.controller;
+
 import com.example.InstaPrj.dto.ReviewsDTO;
-import com.example.InstaPrj.service.ReviewsService;
+import com.example.InstaPrj.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -15,12 +16,12 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/reviews")
 public class ReviewsController {
-  private final ReviewsService reviewsService;
+  private final ReviewService reviewService;
 
   @GetMapping(value = "/{fno}/all", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<List<ReviewsDTO>> getList(@PathVariable("fno") Long fno) {
     log.info("fno: " + fno);
-    List<ReviewsDTO> reviewsDTOList = reviewsService.getListOfFeeds(fno);
+    List<ReviewsDTO> reviewsDTOList = reviewService.getListOfFeeds(fno);
     return new ResponseEntity<>(reviewsDTOList, HttpStatus.OK);
   }
 
@@ -29,22 +30,22 @@ public class ReviewsController {
   // @RequestParam : 변수로 데이터를 전송받을 때
   public ResponseEntity<Long> register(@RequestBody ReviewsDTO reviewsDTO) {
     log.info(">>" + reviewsDTO);
-    Long revieswnum = reviewsService.register(reviewsDTO);
-    return new ResponseEntity<>(revieswnum, HttpStatus.OK);
+    Long reviewsnum = reviewService.register(reviewsDTO);
+    return new ResponseEntity<>(reviewsnum, HttpStatus.OK);
   }
 
   @PutMapping("/{fno}/{reviewsnum}")
   public ResponseEntity<Long> modify(@RequestBody ReviewsDTO reviewsDTO) {
     log.info(">>" + reviewsDTO);
-    reviewsService.modify(reviewsDTO);
+    reviewService.modify(reviewsDTO);
     return new ResponseEntity<>(reviewsDTO.getReviewsnum(), HttpStatus.OK);
   }
 
   @DeleteMapping("/{fno}/{reviewsnum}")
-  public ResponseEntity<Long> delete(@PathVariable Long revieswnum) {
-    log.info(">>" + revieswnum);
-    reviewsService.remove(revieswnum);
-    return new ResponseEntity<>(revieswnum, HttpStatus.OK);
+  public ResponseEntity<Long> delete(@PathVariable Long reviewsnum) {
+    log.info(">>" + reviewsnum);
+    reviewService.remove(reviewsnum);
+    return new ResponseEntity<>(reviewsnum, HttpStatus.OK);
   }
 
 }

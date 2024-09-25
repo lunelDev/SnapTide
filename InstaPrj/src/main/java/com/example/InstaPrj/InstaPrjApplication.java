@@ -10,9 +10,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories(basePackages = "com.example.InstaPrj.repository")
 public class InstaPrjApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(InstaPrjApplication.class, args);
-		System.out.println("http://localhost:8080/InstaPrj");
-	}
+  public static void main(String[] args) {
+    SpringApplication.run(InstaPrjApplication.class, args);
+    System.out.println("http://localhost:8080/instaprj");
+  }
 
 }

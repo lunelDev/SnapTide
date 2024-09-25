@@ -14,11 +14,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FeedsDTO {
-  private Long fno; //pst 번호
-  private String title; //게시글 내용
-  private String content; //게시글 내용
-  @Builder.Default
+  private Long fno;
+  private String title;
+  @Builder.Default // @AllArgsConstructor가 없으면 에러,기본값초기화
   private List<PhotosDTO> photosDTOList = new ArrayList<>();
+  private double likes;
   private Long reviewsCnt;
   private LocalDateTime regDate;
   private LocalDateTime modDate;

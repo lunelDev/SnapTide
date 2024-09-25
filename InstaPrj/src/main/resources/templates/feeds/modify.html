@@ -2,8 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <th:block th:replace="~{/layout/basic :: setContent(~{this::content})}">
   <th:block th:fragment="content">
-    <div class="m-5">
-    <h1 class="mt-4">Feeds Modify Page</h1>
+    <h2 class="mt-4">Feed Modify Page</h2>
     <style>
       .form-group {margin-bottom: 30px;}
       .uploadResult {width: 100%;background:gray;margin-top:10px;}
@@ -16,7 +15,7 @@
     </style>
     <form th:action="@{/feeds/modify}" th:method="post" id="frmSend">
       <div class="form-group">
-        <label>Mno</label>
+        <label>Fno</label>
         <input type="text" th:value="${feedsDTO.fno}" name="fno" class="form-control" readonly>
       </div>
       <div class="form-group">
@@ -26,6 +25,10 @@
       <div style="margin-bottom: 30px;">
         <label>Review Count</label>
         <input type="text" name="reviewsCnt" class="form-control" readonly th:value="${feedsDTO.reviewsCnt}">
+      </div>
+      <div style="margin-bottom: 30px;">
+        <label>Average</label>
+        <input type="text" name="likes" readonly class="form-control" th:value="${feedsDTO.likes}">
       </div>
       <div class="form-group">
         <label>RegDate</label>
@@ -58,8 +61,8 @@
         <li th:each="photosDTO : ${feedsDTO.photosDTOList}"
             th:data-path='${photosDTO.path}'
             th:data-uuid='${photosDTO.uuid}'
-            th:data-file='${photosDTO.getImageURL}'
-            th:data-name='${photosDTO.imgName}'
+            th:data-file='${photosDTO.getPhotosURL}'
+            th:data-name='${photosDTO.photosName}'
             style="cursor:pointer;">
           <div>
             <button type="button"
@@ -172,7 +175,7 @@
         const liArr = document.querySelectorAll(".uploadResult ul li");
         for(let i=0;i<liArr.length;i++){
           str += `
-            <input type="hidden" name="photosDTOList[${i}].imgName" value="${liArr[i].dataset.name}">
+            <input type="hidden" name="photosDTOList[${i}].photosName" value="${liArr[i].dataset.name}">
             <input type="hidden" name="photosDTOList[${i}].path" value="${liArr[i].dataset.path}">
             <input type="hidden" name="photosDTOList[${i}].uuid" value="${liArr[i].dataset.uuid}">
           `
@@ -195,7 +198,8 @@
         window.history.back();
       }
     </script>
-    </div>
   </th:block>
+
 </th:block>
+
 </html>
