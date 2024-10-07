@@ -1,3 +1,13 @@
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.material-icons {
+  font-family: 'Material Icons';
+  display: inline-block;
+}
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
