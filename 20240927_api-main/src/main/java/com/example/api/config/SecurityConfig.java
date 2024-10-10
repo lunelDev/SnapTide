@@ -49,7 +49,7 @@ public class SecurityConfig {
   }
 
   // String 배열에 정의된 주소는 token으로 인증해야만 접근할 수 있는 주소.
-  String[] checkAddress = {"/feeds/**", "/members/**", "/reviews/**"};
+  String[] checkAddress = {"/feeds/**", "/members/**", "/reviews/**", "/display/**"};
   @Bean
   public ApiCheckFilter apiCheckFilter() {
     return new ApiCheckFilter(checkAddress, jwtUtil());
@@ -68,6 +68,7 @@ public class SecurityConfig {
             .requestMatchers(new AntPathRequestMatcher("/feeds/**")).permitAll()
             .requestMatchers(new AntPathRequestMatcher("/members/**")).permitAll()
             .requestMatchers(new AntPathRequestMatcher("/reviews/**")).permitAll()
+            .requestMatchers(new AntPathRequestMatcher("/display/**")).permitAll()
             .anyRequest().denyAll());
 
     // addFilterBefore는 일반적 필터링 순서보다 앞쪽에서 필터링하도록 순서 조정.

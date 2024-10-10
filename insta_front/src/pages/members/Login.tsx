@@ -53,8 +53,10 @@ export default function Login() {
         })
           .then(res => res.text())
           .then(token => {
-            console.log('Saved in Session')
+            // console.log('Saved in Session')
+            // console.log(token)
             sessionStorage.setItem('token', token)
+            navigate('/feeds/list')
           })
           .catch(err => console.log('Error:', err))
       })

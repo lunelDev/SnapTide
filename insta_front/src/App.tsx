@@ -1,7 +1,5 @@
-import {useState} from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+
 import {Provider as ReduxProvider} from 'react-redux'
 import {configureStore} from '@reduxjs/toolkit'
 import type {Action} from '@reduxjs/toolkit'
