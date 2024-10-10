@@ -1,4 +1,6 @@
 import './App.css'
+import './assets/styles.css'
+// import style from '../public/styles.css'
 
 import {Provider as ReduxProvider} from 'react-redux'
 import {configureStore} from '@reduxjs/toolkit'

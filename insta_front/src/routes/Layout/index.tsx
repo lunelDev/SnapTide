@@ -6,13 +6,13 @@ export default function Layout() {
     <>
       <NavigationBar
         style={{
-          backgroundColor: '#bd5d38',
-          width: '23vw',
-          minHeight: '100vh',
-          float: 'left',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
+          backgroundColor: '#bd5d38'
+          // width: '23vw',
+          // minHeight: '100vh',
+          // float: 'left',
+          // display: 'flex',
+          // alignItems: 'center',
+          // justifyContent: 'center'
         }}
       />
       <MainContents
