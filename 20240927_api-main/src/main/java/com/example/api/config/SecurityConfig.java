@@ -49,7 +49,9 @@ public class SecurityConfig {
   }
 
   // String 배열에 정의된 주소는 token으로 인증해야만 접근할 수 있는 주소.
-  String[] checkAddress = {"/feeds/**", "/members/**", "/reviews/**", "/display/**"};
+  String[] checkAddress = {"/feeds/**", "/members/**", "/reviews/**"
+//      , "/display/**"
+  };
   @Bean
   public ApiCheckFilter apiCheckFilter() {
     return new ApiCheckFilter(checkAddress, jwtUtil());

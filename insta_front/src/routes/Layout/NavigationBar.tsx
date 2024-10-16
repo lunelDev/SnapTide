@@ -11,7 +11,7 @@ export const NavigationBar: FC<NavProps> = ({style}) => {
       className="navbar navbar-expand-lg navbar-dark bg-primary fixed-top"
       id="sideNav">
       <a className="navbar-brand js-scroll-trigger" href="#page-top">
-        <span className="d-block d-lg-none">jisu</span>
+        <span className="d-block d-lg-none">LGH</span>
         <span className="d-none d-lg-block">
           <img
             className="mx-auto mb-2 img-fluid img-profile rounded-circle"
