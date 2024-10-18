@@ -21,6 +21,7 @@ const App: React.FC = () => {
         <Route path="/" element={<PrivateRoute component={Layout} />} />
         <Route path="/feeds/list" element={<PrivateRoute component={Layout} />} />
         <Route path="/feeds/register" element={<PrivateRoute component={Layout} />} />
+        <Route path="/feeds/read" element={<PrivateRoute component={Layout} />} />
         <Route path="/feeds/modify" element={<PrivateRoute component={Layout} />} />
         <Route path="*" element={<PrivateRoute component={NoMatch} />} />
       </Routes>

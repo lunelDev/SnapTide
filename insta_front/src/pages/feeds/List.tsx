@@ -135,12 +135,6 @@ export default function List() {
 
   return (
     <>
-      {/* <h2 className="mt-4">
-        Feeds
-        <a className="btn btn-outline-primary" href="/feeds/register">
-          Register
-        </a>
-      </h2> */}
       <form method="GET">
         <div className="input-group">
           <div className="input-group-prepend" style={{marginRight: '10px'}}>
@@ -191,7 +185,6 @@ export default function List() {
             style={{borderRadius: '5px', fontSize: '22px'}}
             ref={refKeyword}
             disabled={inverted}
-            // readOnly={!inverted}
             onChange={e => {
               console.log(refKeyword.current?.readOnly)
               setKeywords(e.target.value)
@@ -292,6 +285,7 @@ export default function List() {
       <div
         className="modal fade"
         id="myModal"
+        style={{background: 'pink'}}
         aria-labelledby="exampleModalLabel"
         aria-hidden="true">
         <div className="modal-dialog">
