@@ -1,3 +1,4 @@
+import {useNavigate} from 'react-router-dom'
 import '../../App.css'
 import type {FC, CSSProperties} from 'react'
 
@@ -6,6 +7,14 @@ export type NavProps = {
 }
 
 export const NavigationBar: FC<NavProps> = ({style}) => {
+  const navigate = useNavigate()
+
+  const logout = (e: React.MouseEvent) => {
+    e.preventDefault()
+    sessionStorage.removeItem('token')
+    sessionStorage.removeItem('email')
+    navigate('/')
+  }
   return (
     <nav
       className="navbar navbar-expand-lg navbar-dark bg-primary fixed-top"
@@ -33,7 +42,7 @@ export const NavigationBar: FC<NavProps> = ({style}) => {
       <div className="collapse navbar-collapse" id="navbarResponsive">
         <ul className="navbar-nav">
           <li className="nav-item">
-            <a className="nav-link js-scroll-trigger" href="/logout">
+            <a className="nav-link js-scroll-trigger" href="/logout" onClick={logout}>
               Logout
             </a>
           </li>

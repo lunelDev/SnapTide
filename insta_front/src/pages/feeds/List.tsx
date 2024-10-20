@@ -129,8 +129,12 @@ export default function List() {
   }
 
   const goRead = (fno: number, page: number, type: string, keyword: string) => {
+    location.href = url + `/read?fno=${fno}&page=${page}&type=${type}&keyword=${keyword}`
+  }
+  const goRegister = () => {
     location.href =
-      url + `/detail?fno=${fno}&page=${page}&type=${type}&keyword=${keyword}`
+      url +
+      `/register?page=${pageRequestDTO.page}&type=${pageRequestDTO.type}&keyword=${pageRequestDTO.keyword}`
   }
 
   return (
@@ -186,7 +190,7 @@ export default function List() {
             ref={refKeyword}
             disabled={inverted}
             onChange={e => {
-              console.log(refKeyword.current?.readOnly)
+              // console.log(refKeyword.current?.readOnly)
               setKeywords(e.target.value)
             }}
             value={pageRequestDTO.keyword ?? keywords}
@@ -201,6 +205,19 @@ export default function List() {
               disabled={inverted}>
               Search
             </button>
+            <button
+              type="button"
+              style={{
+                fontSize: '30px',
+                marginLeft: '10px',
+                background: 'white',
+                color: '#bd5d38',
+                border: '1px solid #bd5d38'
+              }}
+              className="btn btn-outline-secondary"
+              onClick={goRegister}>
+              Register
+            </button>
           </div>
         </div>
       </form>
@@ -208,7 +225,7 @@ export default function List() {
         <thead>
           <tr>
             <th scope="col">Fno</th>
-            <th scope="col">Title & Photo</th>
+            <th scope="col">Photo & Title</th>
             <th scope="col">Review Count</th>
             <th scope="col">Average Rating</th>
             <th scope="col">RegDate</th>
@@ -229,7 +246,19 @@ export default function List() {
                 )
               }>
               <th scope="row">{feedsDTO.fno}</th>
-              <td>{feedsDTO.title}</td>
+              <td>
+                {feedsDTO.photosDTOList.length > 0 &&
+                feedsDTO.photosDTOList[0].path != null ? (
+                  <img
+                    src={`http://localhost:8080/api/display?fileName=${feedsDTO.photosDTOList[0].thumbnailURL}`}
+                    style={{display: 'inline-block', marginRight: '20px'}}
+                    alt="Feed Thumbnail"
+                  />
+                ) : (
+                  ''
+                )}
+                {feedsDTO.title}
+              </td>
               <td>
                 <b>{feedsDTO.reviewsCnt}</b>
               </td>

@@ -57,6 +57,7 @@ export default function Login() {
               navigate('/login')
             } else {
               sessionStorage.setItem('token', token)
+              sessionStorage.setItem('email', email)
               navigate('/feeds/list')
             }
           })
