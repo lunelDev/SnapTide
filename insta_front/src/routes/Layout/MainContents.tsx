@@ -14,6 +14,9 @@ export const MainContents: FC<MainContentsProps> = ({style}) => {
   // const queryString = location.search
   let {pathname} = location
 
+  // 경로를 단축하여 보여주기
+  const shortPathname = pathname.replace('/feeds/', '').replace('/', '')
+
   // 경로에 따른 컴포넌트 선택
   const renderContent = () => {
     switch (pathname) {
@@ -40,15 +43,15 @@ export const MainContents: FC<MainContentsProps> = ({style}) => {
       <section id="about" style={{margin: '0 40px', height: '100vh'}}>
         <div className="resume-section-content">
           <h1 className="mt-4">
-            <span className="text-primary">Insta </span>
+            <span style={{color: '#5a6363'}}>Snap Tide </span>
             <div
               style={{
-                fontSize: '32px',
+                // fontSize: '32px',
                 paddingLeft: '10px',
                 display: 'inline-block',
                 width: '250px'
               }}>
-              {pathname}
+              {shortPathname || 'list'}
             </div>
           </h1>
           <div className="resume-section">{renderContent()}</div>

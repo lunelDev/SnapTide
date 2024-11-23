@@ -237,8 +237,8 @@ export default function Register() {
             style={{
               fontSize: '30px',
               background: 'white',
-              color: '#bd5d38',
-              border: '1px solid #bd5d38'
+              color: '#5a6363',
+              border: '1px solid #5a6363'
             }}
             type="submit"
             className="btn btn-outline-secondary">

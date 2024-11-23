@@ -199,8 +199,8 @@ export default function List() {
           <div className="input-group-append" style={{marginLeft: '10px'}}>
             <button
               type="button"
-              style={{fontSize: '30px'}}
-              className="btn btn-outline-primary btnSearch"
+              style={{fontSize: '30px', border: '1px solid #c2d1d1'}}
+              className="btn btnSearch"
               onClick={getSearch}
               ref={refBtnSrch}
               disabled={inverted}>
@@ -212,8 +212,8 @@ export default function List() {
                 fontSize: '30px',
                 marginLeft: '10px',
                 background: 'white',
-                color: '#bd5d38',
-                border: '1px solid #bd5d38'
+                color: '#5a6363',
+                border: '1px solid #c2d1d1'
               }}
               type="button"
               className="btn btn-outline-secondary">

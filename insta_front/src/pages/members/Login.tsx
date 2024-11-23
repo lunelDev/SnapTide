@@ -80,10 +80,10 @@ export default function Login() {
       <div className="flex flex-col items-center justify-center flex-1 max-w-sm mx-auto">
         <div
           className="w-full px-6 py-8 text-black rounded shadow-md"
-          style={{background: '#bd5d38'}}>
+          style={{background: '#c2d1d1'}}>
           <form method="post" onSubmit={onSubmit}>
             <h1 className="mb-8 text-4xl text-center text-white text-primary">
-              Insta Feeds
+              Snap Tide
             </h1>
             <input
               type="text"

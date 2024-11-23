@@ -17,14 +17,19 @@ export const NavigationBar: FC<NavProps> = ({style}) => {
   }
   return (
     <nav
-      className="navbar navbar-expand-lg navbar-dark bg-primary fixed-top"
+      style={{background: '#c2d1d1'}}
+      className="navbar navbar-expand-lg navbar-dark fixed-top"
       id="sideNav">
       <a className="navbar-brand js-scroll-trigger" href="#page-top">
-        <span className="d-block d-lg-none">LGH</span>
+        <span
+          className="d-block d-lg-none"
+          style={{color: 'white', fontWeight: 'bold', fontSize: '25px'}}>
+          SnapTide
+        </span>
         <span className="d-none d-lg-block">
           <img
             className="mx-auto mb-2 img-fluid img-profile rounded-circle"
-            src="/profile.jpg"
+            src="/profile.png"
             alt="..."
           />
         </span>
