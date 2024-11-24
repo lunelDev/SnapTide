@@ -1,5 +1,4 @@
 import './assets/styles.css'
-
 import React from 'react'
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import Join from './pages/members/Join'
@@ -22,7 +21,7 @@ const App: React.FC = () => {
         <Route path="/feeds/list" element={<PrivateRoute component={Layout} />} />
         <Route path="/feeds/register" element={<PrivateRoute component={Layout} />} />
         <Route path="/feeds/read" element={<PrivateRoute component={Layout} />} />
-        <Route path="/feeds/modify" element={<PrivateRoute component={Layout} />} />
+        <Route path="/feeds/modify/:fno" element={<PrivateRoute component={Layout} />} />
         <Route path="*" element={<PrivateRoute component={NoMatch} />} />
       </Routes>
     </Router>
