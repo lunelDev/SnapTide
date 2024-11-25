@@ -29,14 +29,10 @@ const Modify: React.FC = () => {
   const [formData, setFormData] = useState<FeedsDTO | null>(state?.feedsDTO || null)
   const [newImages, setNewImages] = useState<File[]>([]) // 새로 추가된 이미지
   const [deletedImages, setDeletedImages] = useState<string[]>([]) // 삭제할 이미지의 UUID
+  const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]) // 새로 추가된 이미지 미리보기 URL
 
-  const addDefaultImg = (e: SyntheticEvent<HTMLImageElement, Event>) => {
-    e.currentTarget.src = '/path/to/default-image.png' // 기본 이미지 경로 설정
-  }
-
-  // 이미지 삭제 핸들러
   const handleImageDelete = (uuid: string) => {
-    setDeletedImages(prev => [...prev, uuid]) // 삭제할 이미지 UUID 추가
+    setDeletedImages(prev => [...prev, uuid])
     setFormData(prev =>
       prev
         ? {
@@ -47,54 +43,59 @@ const Modify: React.FC = () => {
     )
   }
 
-  // 새 이미지 추가 핸들러
+  const handleNewImageDelete = (index: number) => {
+    setNewImages(prev => prev.filter((_, i) => i !== index))
+    setNewImagePreviews(prev => prev.filter((_, i) => i !== index))
+  }
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setNewImages(prev => [...prev, ...Array.from(e.target.files)])
+      const files = Array.from(e.target.files)
+      setNewImages(prev => [...prev, ...files])
+
+      // 미리보기 URL 생성
+      const previewUrls = files.map(file => URL.createObjectURL(file))
+      setNewImagePreviews(prev => [...prev, ...previewUrls])
     }
   }
 
-  // 저장 버튼 클릭 핸들러
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData || !token) {
-      console.error('No form data or token to save')
+      alert('No form data or token to save.')
       return
     }
 
     try {
-      // 삭제할 이미지 요청
-      for (const uuid of deletedImages) {
-        const res = await fetch(`http://localhost:8080/api/feeds/photos/${uuid}`, {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        })
-        if (!res.ok) {
-          throw new Error(`Error deleting image with UUID: ${uuid}`)
-        }
-      }
-
-      // 수정 요청
       const formDataToSend = new FormData()
-      formDataToSend.append('feed', JSON.stringify(formData))
+
+      // Feed 데이터 추가
+      formDataToSend.append(
+        'feed',
+        new Blob([JSON.stringify(formData)], {type: 'application/json'})
+      )
+
+      // 새로 추가된 이미지 추가
       newImages.forEach(image => {
         formDataToSend.append('images', image)
       })
 
-      const response = await fetch(
-        `http://localhost:8080/api/feeds/modify/${formData.fno}`,
-        {
-          method: 'PUT',
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          body: formDataToSend
-        }
-      )
+      // 삭제된 이미지 UUID 추가
+      deletedImages.forEach(uuid => {
+        formDataToSend.append('deletedImages', uuid)
+      })
+
+      const response = await fetch('http://localhost:8080/api/feeds/modify', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: formDataToSend
+      })
 
       if (!response.ok) {
+        const errorData = await response.json()
+        console.error('Error Response:', errorData)
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
@@ -106,7 +107,6 @@ const Modify: React.FC = () => {
     }
   }
 
-  // 피드 삭제 핸들러
   const handleFeedDelete = () => {
     if (!formData || !token) {
       console.error('No feed data or token available for deletion')
@@ -125,7 +125,7 @@ const Modify: React.FC = () => {
             throw new Error(`HTTP error! status: ${response.status}`)
           }
           alert('Feed deleted successfully')
-          navigate('/feeds/list') // 삭제 후 리스트 페이지로 이동
+          navigate('/feeds/list')
         })
         .catch(error => {
           console.error('Error occurred while deleting the feed:', error)
@@ -167,19 +167,35 @@ const Modify: React.FC = () => {
         <div className="form-group">
           <label>Images</label>
           <ul>
+            {/* 기존 이미지 */}
             {formData.photosDTOList.map(photo => (
               <li key={photo.uuid} style={{marginBottom: '10px'}}>
                 <img
                   src={`http://localhost:8080/api/display?fileName=${photo.thumbnailURL}`}
                   alt="Feed Thumbnail"
                   style={{maxWidth: '100px', marginRight: '10px'}}
-                  onError={addDefaultImg}
                 />
                 <button
                   type="button"
                   className="btn btn-danger"
                   onClick={() => handleImageDelete(photo.uuid)}>
                   Delete
+                </button>
+              </li>
+            ))}
+            {/* 새로 업로드한 이미지 미리보기 */}
+            {newImagePreviews.map((url, index) => (
+              <li key={index} style={{marginBottom: '10px'}}>
+                <img
+                  src={url}
+                  alt="New Thumbnail"
+                  style={{maxWidth: '100px', marginRight: '10px'}}
+                />
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={() => handleNewImageDelete(index)}>
+                  Remove
                 </button>
               </li>
             ))}
@@ -193,11 +209,7 @@ const Modify: React.FC = () => {
             name="reviewsCnt"
             className="form-control"
             value={formData.reviewsCnt}
-            onChange={e =>
-              setFormData(prev =>
-                prev ? {...prev, reviewsCnt: Number(e.target.value)} : null
-              )
-            }
+            readOnly
           />
         </div>
         <div className="form-group">
@@ -207,11 +219,7 @@ const Modify: React.FC = () => {
             name="likes"
             className="form-control"
             value={formData.likes}
-            onChange={e =>
-              setFormData(prev =>
-                prev ? {...prev, likes: Number(e.target.value)} : null
-              )
-            }
+            readOnly
           />
         </div>
         <button type="submit" className="btn btn-primary">

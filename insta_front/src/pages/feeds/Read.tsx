@@ -1,7 +1,6 @@
 import {SyntheticEvent, useCallback, useEffect, useState} from 'react'
 import {useNavigate, useSearchParams} from 'react-router-dom'
 import useToken from '../../hooks/useToken'
-import defaultImg from '../../assets/no-img.gif'
 
 // Feed 데이터 구조 정의
 interface FeedsDTO {
@@ -35,25 +34,28 @@ export default function Read() {
 
   // 데이터 가져오기
   useEffect(() => {
-    const url = `http://localhost:8080/api/feeds/read/${fno}`
-    if (token) {
-      fetch(url, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-        .then(res => {
-          if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`)
+    const fetchFeed = async () => {
+      try {
+        const response = await fetch(`http://localhost:8080/api/feeds/read/${fno}`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
           }
-          return res.json()
         })
-        .then(data => {
-          setFeedsDTO(data.feedsDTO)
-        })
-        .catch(err => console.error('Error:', err))
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
+        const data = await response.json()
+        setFeedsDTO(data) // 직접 feedsDTO로 설정
+      } catch (error) {
+        console.error('Error fetching feed:', error)
+      }
     }
+
+    if (fno && token) fetchFeed()
   }, [fno, token])
 
   const transDateFormat = useCallback((d: string) => {
@@ -73,9 +75,6 @@ export default function Read() {
     )
   }, [])
 
-  const addDefaultImg = (e: SyntheticEvent<HTMLImageElement, Event>) => {
-    e.currentTarget.src = defaultImg
-  }
   const handleModifyClick = (e: SyntheticEvent) => {
     e.preventDefault()
     if (!feedsDTO) {
@@ -167,38 +166,28 @@ export default function Read() {
           </button>
         </div>
       </form>
-      <div className="uploadResult">
-        <ul>
-          {feedsDTO.photosDTOList.map((photosDTO, idx) => (
-            <li key={idx} style={{cursor: 'pointer'}}>
-              {photosDTO.thumbnailURL ? (
-                <img
-                  src={`http://localhost:8080/api/display?fileName=${photosDTO.thumbnailURL}`}
-                  style={{
-                    display: 'inline-block',
-                    marginRight: '20px',
-                    maxWidth: '100px',
-                    height: 'auto'
-                  }}
-                  alt="Feed Thumbnail"
-                  onError={addDefaultImg}
-                />
-              ) : (
-                <img
-                  src={defaultImg}
-                  style={{
-                    display: 'inline-block',
-                    marginRight: '20px',
-                    maxWidth: '100px',
-                    height: 'auto'
-                  }}
-                  alt="Default Thumbnail"
-                />
-              )}
-            </li>
-          ))}
-        </ul>
-      </div>
+      {feedsDTO.photosDTOList.length > 0 && (
+        <div className="uploadResult">
+          <ul>
+            {feedsDTO.photosDTOList
+              .filter(photosDTO => photosDTO.thumbnailURL) // 이미지가 있는 항목만 필터링
+              .map((photosDTO, idx) => (
+                <li key={idx} style={{cursor: 'pointer'}}>
+                  <img
+                    src={`http://localhost:8080/api/display?fileName=${photosDTO.thumbnailURL}`}
+                    style={{
+                      display: 'inline-block',
+                      marginRight: '20px',
+                      maxWidth: '100px',
+                      height: 'auto'
+                    }}
+                    alt="Feed Thumbnail"
+                  />
+                </li>
+              ))}
+          </ul>
+        </div>
+      )}
     </>
   )
 }
