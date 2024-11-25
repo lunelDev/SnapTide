@@ -1,6 +1,8 @@
-import {useState} from 'react'
+import {SyntheticEvent, useState} from 'react'
 import {useLocation, useNavigate, useParams} from 'react-router-dom'
+import useToken from '../../hooks/useToken'
 
+// Feed 데이터 구조 정의
 interface FeedsDTO {
   fno: number
   title: string
@@ -11,6 +13,7 @@ interface FeedsDTO {
   photosDTOList: PhotosDTO[]
 }
 
+// PhotosDTO 데이터 구조 정의
 interface PhotosDTO {
   uuid: string
   photosName: string
@@ -21,40 +24,27 @@ const Modify: React.FC = () => {
   const {state} = useLocation() // Read에서 전달된 state 받기
   const navigate = useNavigate()
   const {fno: urlFno} = useParams<{fno: string}>()
+  const token = useToken()
 
   const [formData, setFormData] = useState<FeedsDTO | null>(state?.feedsDTO || null)
   const [newImages, setNewImages] = useState<File[]>([]) // 새로 추가된 이미지
+  const [deletedImages, setDeletedImages] = useState<string[]>([]) // 삭제할 이미지의 UUID
 
-  const addDefaultImg = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+  const addDefaultImg = (e: SyntheticEvent<HTMLImageElement, Event>) => {
     e.currentTarget.src = '/path/to/default-image.png' // 기본 이미지 경로 설정
   }
 
   // 이미지 삭제 핸들러
   const handleImageDelete = (uuid: string) => {
-    if (!formData) return
-
-    fetch(`http://localhost:8080/api/feeds/photos/${uuid}`, {
-      method: 'DELETE'
-    })
-      .then(res => {
-        if (!res.ok) {
-          console.error(`Error deleting image: ${res.statusText}`)
-          throw new Error(`HTTP error! status: ${res.status}`)
-        }
-        return res.json()
-      })
-      .then(() => {
-        setFormData(prev =>
-          prev
-            ? {
-                ...prev,
-                photosDTOList: prev.photosDTOList.filter(photo => photo.uuid !== uuid)
-              }
-            : null
-        )
-        alert('Image deleted successfully')
-      })
-      .catch(error => console.error('Error deleting image:', error))
+    setDeletedImages(prev => [...prev, uuid]) // 삭제할 이미지 UUID 추가
+    setFormData(prev =>
+      prev
+        ? {
+            ...prev,
+            photosDTOList: prev.photosDTOList.filter(photo => photo.uuid !== uuid)
+          }
+        : null
+    )
   }
 
   // 새 이미지 추가 핸들러
@@ -65,40 +55,83 @@ const Modify: React.FC = () => {
   }
 
   // 저장 버튼 클릭 핸들러
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formData) {
-      console.error('No form data to save')
+    if (!formData || !token) {
+      console.error('No form data or token to save')
       return
     }
 
-    const formDataToSend = new FormData()
-    formDataToSend.append('feed', JSON.stringify(formData))
-    newImages.forEach(image => {
-      formDataToSend.append('images', image)
-    })
-
-    console.log('Sending form data:', formDataToSend) // 디버그용 출력
-
-    fetch(`http://localhost:8080/api/feeds/modify/${formData.fno}`, {
-      method: 'PUT',
-      body: formDataToSend
-    })
-      .then(response => {
-        console.log('API Response:', response) // 응답 전체 출력
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
+    try {
+      // 삭제할 이미지 요청
+      for (const uuid of deletedImages) {
+        const res = await fetch(`http://localhost:8080/api/feeds/photos/${uuid}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        if (!res.ok) {
+          throw new Error(`Error deleting image with UUID: ${uuid}`)
         }
-        return response.json()
+      }
+
+      // 수정 요청
+      const formDataToSend = new FormData()
+      formDataToSend.append('feed', JSON.stringify(formData))
+      newImages.forEach(image => {
+        formDataToSend.append('images', image)
       })
-      .then(() => {
-        alert('Modification successful')
-        navigate(`/feeds/read?fno=${formData.fno}`)
+
+      const response = await fetch(
+        `http://localhost:8080/api/feeds/modify/${formData.fno}`,
+        {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          body: formDataToSend
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      alert('Modification successful')
+      navigate(`/feeds/read?fno=${formData.fno}`)
+    } catch (error) {
+      console.error('Error occurred while saving:', error)
+      alert('An error occurred while saving')
+    }
+  }
+
+  // 피드 삭제 핸들러
+  const handleFeedDelete = () => {
+    if (!formData || !token) {
+      console.error('No feed data or token available for deletion')
+      return
+    }
+
+    if (window.confirm(`Are you sure you want to delete feed #${formData.fno}?`)) {
+      fetch(`http://localhost:8080/api/feeds/${formData.fno}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       })
-      .catch(error => {
-        console.error('Error occurred:', error)
-        alert('An error occurred while saving')
-      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`)
+          }
+          alert('Feed deleted successfully')
+          navigate('/feeds/list') // 삭제 후 리스트 페이지로 이동
+        })
+        .catch(error => {
+          console.error('Error occurred while deleting the feed:', error)
+          alert('An error occurred while deleting the feed')
+        })
+    }
   }
 
   if (!formData) {
@@ -183,6 +216,9 @@ const Modify: React.FC = () => {
         </div>
         <button type="submit" className="btn btn-primary">
           Save
+        </button>
+        <button type="button" className="btn btn-danger" onClick={handleFeedDelete}>
+          Delete Feed
         </button>
         <button
           type="button"
