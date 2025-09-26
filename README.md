@@ -30,7 +30,6 @@ Spring Boot 기반 REST API 서버와 React(TypeScript) 클라이언트로 구�
 | 예외 처리 | ControllerAdvice 기반 전역 예외 처리 |
 
 
-
 ## 🧱 ERD 다이어그램
 
 ```text
