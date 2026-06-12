@@ -122,7 +122,7 @@ public class FeedsController {
     ra.addAttribute("page", pageRequestDTO.getPage());
     ra.addAttribute("type", pageRequestDTO.getType());
     ra.addAttribute("keyword", pageRequestDTO.getKeyword());
-    return "redirect:/movies/list";
+    return "redirect:/feeds/list";
   }
 
   // 헬퍼 메서드: 페이지 요청 초기화

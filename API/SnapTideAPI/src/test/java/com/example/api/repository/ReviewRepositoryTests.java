@@ -28,7 +28,7 @@ class ReviewRepositoryTests {
           .members(Members.builder().mid(mid).build())
           .feeds(Feeds.builder().fno(fno).build())
           .likes((int) (Math.random() * 5) + 1)
-          .text("이 영화는.....")
+          .text("이 게시글은.....")
           .build();
       reviewsRepository.save(reviews);
     });

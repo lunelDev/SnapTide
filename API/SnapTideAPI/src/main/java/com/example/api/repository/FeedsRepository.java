@@ -15,14 +15,14 @@ public interface FeedsRepository extends JpaRepository<Feeds, Long>, SearchRepos
 //  from feeds f left outer join reviews r on f.fno = r.feeds_fno
 //  group by f.fno;
 
-  // 영화에 대한 리뷰의 평점과 댓글 갯수를 출력
+  // 피드(게시글)에 대한 리뷰의 평점과 댓글 갯수를 출력
   @Query("select f, count(r.likes), count(distinct r) " +
       "from Feeds f left outer join Reviews r on r.feeds=f group by f ")
   Page<Object[]> getListPage(Pageable pageable);
 
   // 아래와 같은 경우 mi를 찾기 위해서 reviews 카운트 만큼 반복횟수도 늘어나는 문제점
   // mi의 pnum이 가장 낮은 이미지 번호가 출력된다.
-  // 영화와 영화이미지,리뷰의 평점과 댓글 갯수 출력
+  // 피드와 피드이미지, 리뷰의 평점과 댓글 갯수 출력
   @Query("select f, p, count(r.likes), count(distinct r) from Feeds f " +
       "left outer join Photos p on p.feeds = f " +
       "left outer join Reviews     r  on r.feeds  = f group by f ")
@@ -59,7 +59,7 @@ public interface FeedsRepository extends JpaRepository<Feeds, Long>, SearchRepos
       "from Feeds f left outer join Photos p on p.feeds=f " +
       "left outer join Reviews r on r.feeds = f " +
       "where f.fno = :fno group by p ")
-  List<Object[]> getFeedsWithAll(Long fno); //특정 영화 조회
+  List<Object[]> getFeedsWithAll(Long fno); //특정 피드 조회
 
 }
 
