@@ -11,8 +11,13 @@ import java.util.Date;
 
 @Log4j2
 public class JWTUtil {
-  private String secretKey = "***REMOVED***";
-  private long expire = 60 * 24 * 30;
+  private final String secretKey;
+  private final long expire; // 토큰 만료 시간(분)
+
+  public JWTUtil(String secretKey, long expireMinutes) {
+    this.secretKey = secretKey;
+    this.expire = expireMinutes;
+  }
 
   // JWT 생성
   public String generateToken(String content) throws Exception {

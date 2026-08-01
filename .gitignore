@@ -153,3 +153,24 @@ fabric.properties
 .idea/**/azureSettings.xml
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij
+
+### Java / Maven (Spring Boot backend) ###
+target/
+*.class
+*.jar
+*.war
+hs_err_pid*
+!**/mvnw
+!**/mvnw.cmd
+
+### IntelliJ project files (track nothing under .idea) ###
+.idea/
+*.iml
+*.iws
+*.ipr
+
+### Local secrets / environment ###
+*.env
+.env.local
+application-local.properties
+uploads/

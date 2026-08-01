@@ -4,6 +4,7 @@ import com.example.api.security.filter.ApiCheckFilter;
 import com.example.api.security.filter.ApiLoginFilter;
 import com.example.api.security.handler.ApiLoginFailHandler;
 import com.example.api.security.util.JWTUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,6 +25,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+  @Value("${jwt.secret}")
+  private String jwtSecret;
+
+  @Value("${jwt.expiration-minutes:43200}")
+  private long jwtExpireMinutes;
+
   @Bean
   PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
@@ -31,7 +38,7 @@ public class SecurityConfig {
 
   @Bean
   public JWTUtil jwtUtil() {
-    return new JWTUtil();
+    return new JWTUtil(jwtSecret, jwtExpireMinutes);
   }
 
   @Bean

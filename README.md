@@ -54,49 +54,47 @@ Spring Boot 기반 REST API 서버와 React(TypeScript) 클라이언트로 구�
 
 ## 🧱 ERD 다이어그램
 ```text
-Members (회원)
- ├── id (PK)
- ├── email
- ├── password
- ├── nickname
- └── roles (ManyToMany) ──▶ MembersRole
+Members (회원, 테이블명 m_members)
+ ├── mid (PK)
+ ├── email / pw / nickname / name
+ ├── fromSocial (소셜 로그인 여부)
+ └── roleSet (@ElementCollection) ──▶ MembersRole { USER, MANAGER, ADMIN }
 
-Feeds (피드)
- ├── id (PK)
+Feeds (피드 = 게시글)
+ ├── fno (PK)
  ├── title
- ├── content
- ├── member_id (FK) ──▶ Members
-
-Reviews (리뷰)
- ├── id (PK)
- ├── content
- ├── member_id (FK) ──▶ Members
- └── feed_id (FK) ──▶ Feeds
+ └── regDate / modDate (BasicEntity 상속, JPA Auditing 자동 기록)
 
 Photos (사진)
- ├── id (PK)
- ├── uuid
- ├── fileName
- ├── uploadPath
- └── review_id (nullable, FK) ──▶ Reviews
+ ├── pnum (PK)
+ ├── uuid / photosName / path
+ └── feeds (FK) ──▶ Feeds         # 하나의 피드에 다중 사진 (N:1)
+
+Reviews (리뷰 = 별점 + 한줄평)
+ ├── reviewsnum (PK)
+ ├── likes (별점) / text (한줄평)
+ ├── feeds (FK)   ──▶ Feeds       # 피드별 리뷰 (N:1)
+ └── members (FK) ──▶ Members     # 작성자 (N:1)
 ````
 ## 📂 프로젝트 구조
 
 ```plaintext
-snapTide/
-├── backend/                 # Spring Boot API 서버
-│   ├── src/
-│   ├── target/snapTide-api.jar
+SnapTide/
+├── API/SnapTideAPI/               # Spring Boot API 서버
+│   ├── src/main/java/com/example/api/
+│   │   ├── controller/  service/  repository/   # 3-Layer 아키텍처
+│   │   ├── entity/  dto/                         # 도메인 모델 · 전송 객체
+│   │   ├── security/  config/                    # JWT 인증 · 시큐리티 설정
+│   │   └── ApiApplication.java
+│   ├── src/main/resources/application.properties
+│   ├── .env.example                             # 환경변수 예시
 │   └── pom.xml
 │
-├── frontend/                # React 클라이언트
+├── insta_front/                   # React 클라이언트 (Vite + TypeScript)
 │   ├── src/pages/
-│   │   ├── Login.tsx
-│   │   ├── Join.tsx
-│   │   ├── List.tsx
-│   │   ├── Read.tsx
-│   │   ├── Modify.tsx
-│   │   └── Register.tsx
+│   │   ├── members/               # Login.tsx, Join.tsx
+│   │   └── feeds/                 # List.tsx, Read.tsx, Register.tsx, Modify.tsx
+│   ├── src/contexts/  hooks/  routes/  utils/
 │   └── package.json
 │
 └── README.md
@@ -116,19 +114,38 @@ snapTide/
 
 ## ⚙️ 실행 방법 (로컬 · MariaDB 필요)
 
-#### Backend (Spring Boot)
+> DB 접속 정보와 JWT 시크릿은 소스에 하드코딩하지 않고 **환경변수로 주입**합니다.
+> `API/SnapTideAPI/.env.example` 을 참고해 값을 채운 뒤 실행하세요.
+
+#### 1) DB 준비 (MariaDB)
+
+```sql
+CREATE DATABASE db7;
+CREATE USER 'db7'@'localhost' IDENTIFIED BY '<your-password>';
+GRANT ALL PRIVILEGES ON db7.* TO 'db7'@'localhost';
+```
+
+#### 2) Backend (Spring Boot)
 
 ```bash
 cd API/SnapTideAPI
+
+# 환경변수 주입 (예시)
+export DB_PASSWORD='<your-password>'
+export JWT_SECRET='최소 32자 이상의 무작위 문자열'
+
 ./mvnw spring-boot:run
 ```
 
-#### Frontend
+> 테이블은 `spring.jpa.hibernate.ddl-auto=update` 설정으로 최초 실행 시 자동 생성됩니다.
+> 업로드 파일은 기본적으로 `<사용자 홈>/snaptide-uploads` 에 저장됩니다 (`UPLOAD_PATH` 로 변경 가능).
+
+#### 3) Frontend (React + Vite)
 
 ```bash
-cd frontend
+cd insta_front
 npm install
-npm start
+npm run dev
 ```
 ## 📸 주요 화면 (UI 캡처)
 
