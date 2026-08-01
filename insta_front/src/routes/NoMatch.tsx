@@ -8,13 +8,12 @@ export default function NoMatch() {
     navigate(-1)
   }, [navigate])
   return (
-    <div className="flex flex-col p-4">
-      <p className="text-xl text-center alert alert-error">Oops! No page found!</p>
-      <div className="flex justify-center mt-4">
-        <button className="ml-4 btn btn-primary btn-xs" onClick={goBack}>
-          go Back
-        </button>
-      </div>
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-surface px-4 text-center">
+      <h1 className="st-brand text-5xl">404</h1>
+      <p className="text-ink-soft">페이지를 찾을 수 없습니다.</p>
+      <button className="st-btn st-btn--primary" onClick={goBack}>
+        뒤로 가기
+      </button>
     </div>
   )
 }

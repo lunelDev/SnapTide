@@ -46,25 +46,20 @@ export default function Login() {
   }
   const getSession = async (email: string, pw: string) => {
     try {
-      new Promise((resolve, reject) => {
-        // prettier ignore
-        fetch('http://localhost:8080/api/auth/login?email=' + email + '&pw=' + pw, {
-          method: 'POST'
-        })
-          .then(res => res.text())
-          .then(token => {
-            if (token.startsWith('{"code"')) {
-              navigate('/login')
-            } else {
-              sessionStorage.setItem('token', token)
-              sessionStorage.setItem('email', email)
-              navigate('/feeds/list')
-            }
-          })
-          .catch(err => console.log('Error:', err))
-      })
-    } catch (error) {
-    } finally {
+      const res = await fetch(
+        'http://localhost:8080/api/auth/login?email=' + email + '&pw=' + pw,
+        {method: 'POST'}
+      )
+      const token = await res.text()
+      if (token.startsWith('{"code"')) {
+        navigate('/login')
+      } else {
+        sessionStorage.setItem('token', token)
+        sessionStorage.setItem('email', email)
+        navigate('/feeds/list')
+      }
+    } catch (err) {
+      console.log('Error:', err)
     }
   }
   useEffect(() => {
@@ -72,49 +67,47 @@ export default function Login() {
       .then(user => {
         if (user) setForm(user)
       })
-      .catch(e => {})
+      .catch(() => {})
     emailRef.current?.focus()
   }, [])
   return (
-    <div>
-      <div className="flex flex-col items-center justify-center flex-1 max-w-sm mx-auto">
-        <div
-          className="w-full px-6 py-8 text-black rounded shadow-md"
-          style={{background: '#c2d1d1'}}>
-          <form method="post" onSubmit={onSubmit}>
-            <h1 className="mb-8 text-4xl text-center text-white text-primary">
-              Snap Tide
-            </h1>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-surface px-4">
+      <div className="w-full max-w-sm">
+        <div className="st-card px-8 py-10">
+          <div className="mb-8 text-center">
+            <h1 className="st-brand text-4xl">SnapTide</h1>
+            <p className="mt-2 text-sm text-ink-soft">사진으로 소통하는 공간</p>
+          </div>
+          <form method="post" onSubmit={onSubmit} className="space-y-3">
             <input
               type="text"
               name="email"
               ref={emailRef}
-              className="w-full p-3 mb-4 text-xl rounded-lg size-22"
-              placeholder="Email"
-              // value={email}
+              className="st-input"
+              placeholder="이메일"
               onChange={changed('email')}
             />
             <input
               type="password"
               name="pw"
               ref={pwRef}
-              className="w-full p-3 mb-4 text-xl rounded-lg size-22"
-              placeholder="Password"
+              className="st-input"
+              placeholder="비밀번호"
               value={pw}
               onChange={changed('pw')}
             />
             <button
               type="submit"
-              className="w-full p-3 mb-4 text-2xl text-black bg-yellow-400 rounded-lg size-16"
+              className="st-btn st-btn--primary w-full"
               onClick={loginAccount}>
-              Login
+              로그인
             </button>
           </form>
         </div>
-        <div className="mt-6 text-lg text-grey-dark">
-          Create account?
-          <Link className="ml-5 text-lg" to="/join">
-            Join
+        <div className="st-card mt-4 px-8 py-5 text-center text-sm text-ink">
+          계정이 없으신가요?{' '}
+          <Link className="font-semibold text-brand hover:underline" to="/join">
+            가입하기
           </Link>
         </div>
       </div>

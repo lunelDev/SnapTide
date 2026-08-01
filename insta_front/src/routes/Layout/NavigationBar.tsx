@@ -1,73 +1,57 @@
-import {useNavigate} from 'react-router-dom'
-import '../../App.css'
-import type {FC, CSSProperties} from 'react'
+import {Link, useLocation, useNavigate} from 'react-router-dom'
+import type {FC} from 'react'
 
-export type NavProps = {
-  style?: CSSProperties
-}
+const NavLink: FC<{to: string; icon: string; label: string; active?: boolean}> = ({
+  to,
+  icon,
+  label,
+  active
+}) => (
+  <Link
+    to={to}
+    className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition hover:bg-black/[0.04] ${
+      active ? 'text-ink' : 'text-ink-soft'
+    }`}>
+    <span className="material-icons text-[20px]">{icon}</span>
+    <span className="hidden sm:inline">{label}</span>
+  </Link>
+)
 
-export const NavigationBar: FC<NavProps> = ({style}) => {
+export const NavigationBar: FC = () => {
   const navigate = useNavigate()
+  const {pathname} = useLocation()
 
   const logout = (e: React.MouseEvent) => {
     e.preventDefault()
     sessionStorage.removeItem('token')
     sessionStorage.removeItem('email')
-    navigate('/')
+    navigate('/login')
   }
+
+  const isHome = pathname === '/' || pathname === '/feeds/list'
+
   return (
-    <nav
-      style={{background: '#c2d1d1'}}
-      className="navbar navbar-expand-lg navbar-dark fixed-top"
-      id="sideNav">
-      <a className="navbar-brand js-scroll-trigger" href="#page-top">
-        <span
-          className="d-block d-lg-none"
-          style={{color: 'white', fontWeight: 'bold', fontSize: '25px'}}>
+    <header className="sticky top-0 z-20 border-b border-ink-line bg-white/80 backdrop-blur">
+      <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+        <Link to="/feeds/list" className="st-brand text-2xl">
           SnapTide
-        </span>
-        <span className="d-none d-lg-block">
-          <img
-            className="mx-auto mb-2 img-fluid img-profile rounded-circle"
-            src="/profile.png"
-            alt="..."
+        </Link>
+        <nav className="flex items-center gap-0.5">
+          <NavLink to="/feeds/list" icon="home" label="홈" active={isHome} />
+          <NavLink
+            to="/feeds/register"
+            icon="add_box"
+            label="새 게시물"
+            active={pathname === '/feeds/register'}
           />
-        </span>
-      </a>
-      <button
-        className="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarResponsive"
-        aria-controls="navbarResponsive"
-        aria-expanded="false"
-        aria-label="Toggle navigation">
-        <span className="navbar-toggler-icon"></span>
-      </button>
-      <div className="collapse navbar-collapse" id="navbarResponsive">
-        <ul className="navbar-nav">
-          <li className="nav-item">
-            <a className="nav-link js-scroll-trigger" href="/logout" onClick={logout}>
-              Logout
-            </a>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link js-scroll-trigger" href="/feeds/list">
-              Home
-            </a>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link js-scroll-trigger" href="/friends/list">
-              Friends
-            </a>
-          </li>
-          <li className="nav-item">
-            <a className="nav-link js-scroll-trigger" href="/members/mypage">
-              My page
-            </a>
-          </li>
-        </ul>
+          <button
+            onClick={logout}
+            className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-ink-soft transition hover:bg-black/[0.04]">
+            <span className="material-icons text-[20px]">logout</span>
+            <span className="hidden sm:inline">로그아웃</span>
+          </button>
+        </nav>
       </div>
-    </nav>
+    </header>
   )
 }

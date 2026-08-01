@@ -6,7 +6,7 @@ import {useNavigate, useSearchParams} from 'react-router-dom'
 interface Feed {
   fno: number
   title: string
-  photosDTOList: {path: string}[]
+  photosDTOList: {path?: string; thumbnailURL?: string}[]
   reviewsCnt: number
   likes: number
   regDate: string
@@ -137,208 +137,163 @@ export default function List() {
       `/register?page=${pageRequestDTO.page}&type=${pageRequestDTO.type}&keyword=${pageRequestDTO.keyword}`
   }
 
+  const formatDate = (d: string) =>
+    new Intl.DateTimeFormat('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).format(Date.parse(d))
+
   return (
-    <>
-      <form method="GET">
-        <div className="input-group">
-          <div className="input-group-prepend" style={{marginRight: '10px'}}>
-            <select
-              className="form-control"
-              style={{fontSize: '22px'}}
-              ref={refType}
-              name="type"
-              value={types}
-              onChange={e => {
-                if (e) {
-                  setTypes(refType.current?.value ?? '')
-                  if (e.target.selectedIndex === 0) {
-                    if (!keywords) setKeywords('')
-                    setInverted(true)
-                    if (refKeyword.current?.value) {
-                      setKeywords('')
-                    }
-                    navigate(`/`)
-                  } else if (e.target.value !== types) {
-                    console.log('***', e.target.value, types)
-                    if (!keywords) {
-                      setKeywords('')
-                    }
-                    setInverted(false)
-                    if (refKeyword.current?.value) {
-                      setKeywords('')
-                    }
-                    navigate(`/`)
-                    refKeyword.current?.focus()
-                  } else {
-                    setInverted(false)
-                  }
-                }
-                setTypes(e.target.value)
-              }}>
-              {options.map((item, idx) => (
-                <option key={idx} value={item.value}>
-                  {item.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <input
-            type="text"
-            className="form-control"
-            name="keyword"
-            style={{borderRadius: '5px', fontSize: '22px'}}
-            ref={refKeyword}
-            disabled={inverted}
-            // readOnly={!inverted}
-            onChange={e => {
-              console.log(refKeyword.current?.readOnly)
-              setKeywords(e.target.value)
-            }}
-            value={pageRequestDTO.keyword ?? keywords}
-          />
-          <div className="input-group-append" style={{marginLeft: '10px'}}>
-            <button
-              type="button"
-              style={{fontSize: '30px', border: '1px solid #c2d1d1'}}
-              className="btn btnSearch"
-              onClick={getSearch}
-              ref={refBtnSrch}
-              disabled={inverted}>
-              Search
-            </button>
-            <button
-              onClick={goRegister}
-              style={{
-                fontSize: '30px',
-                marginLeft: '10px',
-                background: 'white',
-                color: '#5a6363',
-                border: '1px solid #c2d1d1'
-              }}
-              type="button"
-              className="btn btn-outline-secondary">
-              Register
-            </button>
-          </div>
-        </div>
-      </form>
-      <table className="table table-striped">
-        <thead>
-          <tr>
-            <th scope="col">Fno</th>
-            <th scope="col">Photo & Title</th>
-            <th scope="col">Review Count</th>
-            <th scope="col">Average Rating</th>
-            <th scope="col">RegDate</th>
-          </tr>
-        </thead>
-        <tbody>
-          {pageResultDTO?.dtoList.map(feedsDTO => (
-            <tr
-              key={feedsDTO.fno}
-              className="feedlist"
-              style={{cursor: 'pointer'}}
-              onClick={() =>
-                goRead(
-                  feedsDTO.fno,
-                  pageResultDTO.page,
-                  pageRequestDTO.type,
-                  pageRequestDTO.keyword
-                )
-              }>
-              <th scope="row">{feedsDTO.fno}</th>
-              <td>
-                {feedsDTO.photosDTOList.length > 0 &&
-                feedsDTO.photosDTOList[0].path != null ? (
-                  <img
-                    src={`http://localhost:8080/api/display?fileName=${feedsDTO.photosDTOList[0].thumbnailURL}`}
-                    style={{display: 'inline-block', marginRight: '20px'}}
-                    alt="Feed Thumbnail"
-                  />
-                ) : (
-                  ''
-                )}
-                {feedsDTO.title}
-              </td>
-              <td>
-                <b>{feedsDTO.reviewsCnt}</b>
-              </td>
-              <td>
-                <b>{feedsDTO.likes}</b>
-              </td>
-              <td>
-                {new Intl.DateTimeFormat('ko-KR', {
-                  year: 'numeric',
-                  month: '2-digit',
-                  day: '2-digit',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  second: '2-digit',
-                  hour12: false // 24시간 형식 사용
-                }).format(Date.parse(feedsDTO.regDate))}
-              </td>
-            </tr>
+    <div className="space-y-6">
+      {/* 헤더 + 검색 */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-2xl font-bold text-ink">피드</h1>
+        <button onClick={goRegister} className="st-btn st-btn--primary self-start sm:self-auto">
+          <span className="material-icons text-[18px]">add</span>새 게시물
+        </button>
+      </div>
+
+      <form method="GET" className="flex flex-col gap-2 sm:flex-row">
+        <select
+          className="st-input sm:w-44"
+          ref={refType}
+          name="type"
+          value={types}
+          onChange={e => {
+            if (e) {
+              setTypes(refType.current?.value ?? '')
+              if (e.target.selectedIndex === 0) {
+                if (!keywords) setKeywords('')
+                setInverted(true)
+                if (refKeyword.current?.value) setKeywords('')
+                navigate(`/`)
+              } else if (e.target.value !== types) {
+                if (!keywords) setKeywords('')
+                setInverted(false)
+                if (refKeyword.current?.value) setKeywords('')
+                navigate(`/`)
+                refKeyword.current?.focus()
+              } else {
+                setInverted(false)
+              }
+            }
+            setTypes(e.target.value)
+          }}>
+          {options.map((item, idx) => (
+            <option key={idx} value={item.value}>
+              {item.label}
+            </option>
           ))}
-        </tbody>
-      </table>
-      <ul className="pagination h-100 justify-content-center align-items-center">
-        {pageResultDTO?.prev && (
-          <li className="page-item">
+        </select>
+        <input
+          type="text"
+          className="st-input flex-1 disabled:cursor-not-allowed disabled:opacity-60"
+          name="keyword"
+          placeholder="검색어를 입력하세요"
+          ref={refKeyword}
+          disabled={inverted}
+          onChange={e => setKeywords(e.target.value)}
+          value={pageRequestDTO.keyword ?? keywords}
+        />
+        <button
+          type="button"
+          className="st-btn st-btn--ghost"
+          onClick={getSearch}
+          ref={refBtnSrch}
+          disabled={inverted}>
+          <span className="material-icons text-[18px]">search</span>검색
+        </button>
+      </form>
+
+      {/* 카드 그리드 */}
+      {pageResultDTO && pageResultDTO.dtoList.length === 0 ? (
+        <div className="st-card py-20 text-center text-ink-soft">
+          <span className="material-icons mb-2 text-4xl">photo_library</span>
+          <p className="font-semibold">게시물이 없습니다</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          {pageResultDTO?.dtoList.map(feedsDTO => {
+            const thumb = feedsDTO.photosDTOList?.[0]?.thumbnailURL
+            return (
+              <button
+                key={feedsDTO.fno}
+                onClick={() =>
+                  goRead(
+                    feedsDTO.fno,
+                    pageResultDTO.page,
+                    pageRequestDTO.type,
+                    pageRequestDTO.keyword
+                  )
+                }
+                className="st-card group overflow-hidden text-left transition hover:shadow-soft">
+                <div className="relative aspect-square w-full overflow-hidden bg-black/[0.04]">
+                  {thumb ? (
+                    <img
+                      src={`http://localhost:8080/api/display?fileName=${thumb}`}
+                      alt={feedsDTO.title}
+                      className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-ink-line">
+                      <span className="material-icons text-5xl">image</span>
+                    </div>
+                  )}
+                </div>
+                <div className="p-3">
+                  <p className="truncate font-semibold text-ink">{feedsDTO.title}</p>
+                  <div className="mt-2 flex items-center gap-3 text-xs text-ink-soft">
+                    <span className="flex items-center gap-1">
+                      <span className="material-icons text-[15px]">chat_bubble_outline</span>
+                      {feedsDTO.reviewsCnt ?? 0}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="material-icons text-[15px]">star_outline</span>
+                      {feedsDTO.likes ?? 0}
+                    </span>
+                    <span className="ml-auto">{formatDate(feedsDTO.regDate)}</span>
+                  </div>
+                </div>
+              </button>
+            )
+          })}
+        </div>
+      )}
+
+      {/* 페이지네이션 */}
+      {pageResultDTO && pageResultDTO.pageList.length > 0 && (
+        <nav className="flex items-center justify-center gap-1 pt-2">
+          {pageResultDTO.prev && (
             <a
-              className="page-link"
+              className="st-btn st-btn--ghost px-3 py-2"
               href={`/feeds/list?page=${Math.max(1, pageResultDTO.start - 1)}`}>
-              Prev
+              이전
             </a>
-          </li>
-        )}
-        {pageResultDTO?.pageList.map(page => (
-          <li
-            key={page}
-            className={`page-item ${pageResultDTO?.page === page ? 'active' : ''}`}>
+          )}
+          {pageResultDTO.pageList.map(page => (
             <a
-              className="page-link"
-              href={`/feeds/list?page=${page}&type=${query.get(
-                'type'
-              )}&keyword=${query.get('keyword')}`}>
+              key={page}
+              className={`st-btn px-3.5 py-2 ${
+                pageResultDTO.page === page
+                  ? 'st-btn--primary'
+                  : 'st-btn--ghost'
+              }`}
+              href={`/feeds/list?page=${page}&type=${query.get('type')}&keyword=${query.get(
+                'keyword'
+              )}`}>
               {page}
             </a>
-          </li>
-        ))}
-        {pageResultDTO?.next ? (
-          <li className="page-item">
-            <a className="page-link" href={`/feeds/list?page=${pageResultDTO.end + 1}`}>
-              Next
+          ))}
+          {pageResultDTO.next && (
+            <a
+              className="st-btn st-btn--ghost px-3 py-2"
+              href={`/feeds/list?page=${pageResultDTO.end + 1}`}>
+              다음
             </a>
-          </li>
-        ) : null}
-      </ul>
-      <div
-        className="modal fade"
-        id="myModal"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Modal title
-              </h1>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"></button>
-            </div>
-            <div className="modal-body"></div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
-                Close
-              </button>
-              {/* <button type="button" className="btn btn-primary">Save changes</button> */}
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
+          )}
+        </nav>
+      )}
+    </div>
   )
 }

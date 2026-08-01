@@ -1,4 +1,4 @@
-import {FormEvent, useCallback, useEffect, useRef, useState} from 'react'
+import {FormEvent, useCallback, useRef, useState} from 'react'
 import {useNavigate, useSearchParams} from 'react-router-dom'
 import useToken from '../../hooks/useToken'
 // PhotosDTO 구조 정의
@@ -6,6 +6,15 @@ interface PhotosDTO {
   uuid: string | Blob
   photosName: string | Blob
   path: string | Blob
+}
+
+// 업로드 API(UploadResultDTO) 응답 구조
+interface UploadResult {
+  fileName: string
+  uuid: string
+  folderPath: string
+  photosURL: string
+  thumbnailURL: string
 }
 
 export default function Register() {
@@ -80,8 +89,9 @@ export default function Register() {
       .catch(err => console.log('Error: ', err))
   }, [labelFile])
 
-  function showResult(arr: []) {
+  function showResult(arr: UploadResult[]) {
     const uploadUL = document.querySelector('.uploadResult ul')
+    if (!uploadUL) return
     let str = ''
     const url = 'http://localhost:8080/api/display'
     for (let i = 0; i < arr.length; i++) {
@@ -92,24 +102,23 @@ export default function Register() {
       </div></li>`
     }
     uploadUL.innerHTML = str
-    const removeBtns = document.querySelectorAll('.removeBtn')
+    const removeBtns = document.querySelectorAll<HTMLButtonElement>('.removeBtn')
     for (let i = 0; i < removeBtns.length; i++) {
-      removeBtns[i].onclick = function () {
+      removeBtns[i].onclick = function (ev: MouseEvent) {
         const removeUrl = 'http://localhost:8080/api/removeFile?fileName='
-        const targetLi = this.closest('li')
+        const targetLi = (ev.currentTarget as HTMLElement).closest('li')
+        if (!targetLi) return
         const fileName = targetLi.dataset.file
         console.log(fileName)
-        fetch(removeUrl + fileName, {
-          method: 'POST',
-          dataType: 'json',
-          fileName: fileName
-        })
+        fetch(removeUrl + fileName, {method: 'POST'})
           .then(response => response.json())
           .then(json => {
             console.log(json)
             if (json === true) targetLi.remove()
-            document.querySelector('#custom-label').innerHTML = ''
-            document.querySelector('#fileInput').value = ''
+            const label = document.querySelector('#custom-label')
+            if (label) label.innerHTML = ''
+            const fileInput = document.querySelector<HTMLInputElement>('#fileInput')
+            if (fileInput) fileInput.value = ''
           })
           .catch(err => console.log('Error occurred: ', err))
       }
@@ -136,18 +145,19 @@ export default function Register() {
     }
 
     let str = ''
-    const liArr = document.querySelectorAll('.uploadResult ul li')
+    const liArr = document.querySelectorAll<HTMLLIElement>('.uploadResult ul li')
     let arr: PhotosDTO[] = []
     for (let i = 0; i < liArr.length; i++) {
+      const ds = liArr[i].dataset
       str += `
-            <input type="hidden" name="photosDTOList[${i}].photosName" value="${liArr[i].dataset.name}">
-            <input type="hidden" name="photosDTOList[${i}].path" value="${liArr[i].dataset.path}">
-            <input type="hidden" name="photosDTOList[${i}].uuid" value="${liArr[i].dataset.uuid}">
+            <input type="hidden" name="photosDTOList[${i}].photosName" value="${ds.name}">
+            <input type="hidden" name="photosDTOList[${i}].path" value="${ds.path}">
+            <input type="hidden" name="photosDTOList[${i}].uuid" value="${ds.uuid}">
           `
       arr.push({
-        photosName: liArr[i].dataset.name,
-        path: liArr[i].dataset.path,
-        uuid: liArr[i].dataset.uuid
+        photosName: ds.name ?? '',
+        path: ds.path ?? '',
+        uuid: ds.uuid ?? ''
       })
     }
     setInputHiddens(str)
@@ -191,64 +201,53 @@ export default function Register() {
   }
 
   return (
-    <>
+    <div className="mx-auto max-w-2xl space-y-6">
+      <h1 className="text-2xl font-bold text-ink">새 게시물</h1>
       <form
         onSubmit={handleSubmit}
         id="frmSend"
         method="post"
-        action="http://localhost:8080/api/feeds/register">
-        <div className="form-group">
-          <label htmlFor="title" style={{fontSize: '22px'}}>
-            Title
+        action="http://localhost:8080/api/feeds/register"
+        className="st-card space-y-5 p-6">
+        <div>
+          <label htmlFor="title" className="st-label">
+            제목
           </label>
           <input
             type="text"
             name="title"
             ref={refTitle}
-            style={{fontSize: '22px'}}
             id="title"
-            className="form-control"
+            className="st-input"
             placeholder="타이틀을 입력하세요"
           />
-          {/* <input type="hidden" name="token" value={token ?? ''} /> */}
         </div>
-        <div className="form-group">
-          <label
-            htmlFor="fileInput"
-            style={{fontSize: '22px'}}
-            ref={refLabelFile}
-            value={labelFile ?? 'Select Image Files'}
-          />
+        <div>
+          <label htmlFor="fileInput" className="st-label" ref={refLabelFile}>
+            사진 업로드
+          </label>
           <input
             type="file"
             id="fileInput"
             ref={refFile}
-            style={{fontSize: '22px'}}
             onChange={fileChange}
-            className="custom-file-input form-control files"
-            multiple></input>
-          <label id="custom-label"></label>
+            className="block w-full text-sm text-ink-soft file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-brand file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-brand-hover"
+            multiple
+          />
+          <label id="custom-label" className="mt-1 block text-xs text-ink-soft"></label>
         </div>
         <div
-          className="box"
+          className="hidden"
           dangerouslySetInnerHTML={{__html: transform(inputHiddens)}}></div>
-        <div className="form-group">
-          <button
-            style={{
-              fontSize: '30px',
-              background: 'white',
-              color: '#5a6363',
-              border: '1px solid #5a6363'
-            }}
-            type="submit"
-            className="btn btn-outline-secondary">
-            Submit
+        <div className="uploadResult">
+          <ul></ul>
+        </div>
+        <div className="flex justify-end">
+          <button type="submit" className="st-btn st-btn--primary px-8">
+            등록
           </button>
         </div>
       </form>
-      <div className="uploadResult">
-        <ul></ul>
-      </div>
-    </>
+    </div>
   )
 }

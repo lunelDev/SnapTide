@@ -93,101 +93,64 @@ export default function Read() {
     navigate(`/feeds/list?page=${page}&type=${type}&keyword=${keyword}`)
   }
 
-  if (!feedsDTO) return <div>Loading...</div>
+  if (!feedsDTO)
+    return <div className="py-20 text-center text-ink-soft">불러오는 중…</div>
+
+  const photos = feedsDTO.photosDTOList.filter(p => p.thumbnailURL)
 
   return (
-    <>
-      <h2 className="mt-4">Feed Details</h2>
-      <form>
-        <div className="form-group">
-          <label>Fno</label>
-          <input
-            type="text"
-            value={feedsDTO.fno}
-            name="fno"
-            className="form-control"
-            readOnly
-          />
+    <div className="mx-auto max-w-2xl space-y-6">
+      <div className="flex items-center justify-between">
+        <button
+          onClick={handleBackClick}
+          className="flex items-center gap-1 text-sm font-medium text-ink-soft hover:text-ink">
+          <span className="material-icons text-[18px]">arrow_back</span>목록으로
+        </button>
+        <button onClick={handleModifyClick} className="st-btn st-btn--primary">
+          <span className="material-icons text-[18px]">edit</span>수정
+        </button>
+      </div>
+
+      <article className="st-card overflow-hidden">
+        {photos.length > 0 && (
+          <div className="grid grid-cols-2 gap-1 bg-black/[0.04] sm:grid-cols-3">
+            {photos.map((photosDTO, idx) => (
+              <img
+                key={idx}
+                src={`http://localhost:8080/api/display?fileName=${photosDTO.thumbnailURL}`}
+                alt={`${feedsDTO.title} ${idx + 1}`}
+                className="aspect-square w-full object-cover"
+              />
+            ))}
+          </div>
+        )}
+
+        <div className="space-y-4 p-6">
+          <h1 className="text-2xl font-bold text-ink">{feedsDTO.title}</h1>
+
+          <div className="flex flex-wrap gap-4 text-sm text-ink-soft">
+            <span className="flex items-center gap-1.5">
+              <span className="material-icons text-[18px]">chat_bubble_outline</span>
+              리뷰 {feedsDTO.reviewsCnt}
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="material-icons text-[18px]">star_outline</span>
+              평점 {feedsDTO.likes}
+            </span>
+          </div>
+
+          <dl className="grid grid-cols-1 gap-2 border-t border-ink-line pt-4 text-sm sm:grid-cols-2">
+            <div>
+              <dt className="text-xs font-semibold text-ink-soft">작성일</dt>
+              <dd className="text-ink">{transDateFormat(feedsDTO.regDate)}</dd>
+            </div>
+            <div>
+              <dt className="text-xs font-semibold text-ink-soft">수정일</dt>
+              <dd className="text-ink">{transDateFormat(feedsDTO.modDate)}</dd>
+            </div>
+          </dl>
         </div>
-        <div className="form-group">
-          <label>Title</label>
-          <input
-            type="text"
-            name="title"
-            value={feedsDTO.title}
-            className="form-control"
-            readOnly
-          />
-        </div>
-        <div style={{marginBottom: '30px'}}>
-          <label>Review Count</label>
-          <input
-            type="text"
-            name="reviewsCnt"
-            className="form-control"
-            readOnly
-            value={feedsDTO.reviewsCnt}
-          />
-        </div>
-        <div style={{marginBottom: '30px'}}>
-          <label>Average Likes</label>
-          <input
-            type="text"
-            name="likes"
-            readOnly
-            className="form-control"
-            value={feedsDTO.likes}
-          />
-        </div>
-        <div className="form-group">
-          <label>RegDate</label>
-          <input
-            type="text"
-            className="form-control"
-            value={transDateFormat(feedsDTO.regDate)}
-            readOnly
-          />
-        </div>
-        <div className="form-group">
-          <label>ModDate</label>
-          <input
-            type="text"
-            className="form-control"
-            value={transDateFormat(feedsDTO.modDate)}
-            readOnly
-          />
-        </div>
-        <div className="form-group">
-          <button className="btn btn-primary btnModi" onClick={handleModifyClick}>
-            Modify
-          </button>
-          <button className="btn btn-info btnBack" onClick={handleBackClick}>
-            Back
-          </button>
-        </div>
-      </form>
-      {feedsDTO.photosDTOList.length > 0 && (
-        <div className="uploadResult">
-          <ul>
-            {feedsDTO.photosDTOList
-              .filter(photosDTO => photosDTO.thumbnailURL) // 이미지가 있는 항목만 필터링
-              .map((photosDTO, idx) => (
-                <li key={idx} style={{cursor: 'pointer'}}>
-                  <img
-                    src={`http://localhost:8080/api/display?fileName=${photosDTO.thumbnailURL}`}
-                    style={{
-                      display: 'inline-block',
-                      marginRight: '20px',
-                      maxWidth: '100px',
-                      height: 'auto'
-                    }}
-                    alt="Feed Thumbnail"
-                  />
-                </li>
-              ))}
-          </ul>
-        </div>
-      )}
-    </>
+      </article>
+    </div>
   )
 }

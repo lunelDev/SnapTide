@@ -1,4 +1,3 @@
-import './assets/styles.css'
 import React from 'react'
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import Join from './pages/members/Join'
