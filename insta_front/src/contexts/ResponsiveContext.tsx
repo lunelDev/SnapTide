@@ -12,8 +12,7 @@ export const ResponsiveContext = createContext<ContextType>(defaultContextValue)
 
 type ResponsiveProviderProps = {}
 export const ResponsiveProvider: FC<PropsWithChildren<ResponsiveProviderProps>> = ({
-  children,
-  ...props
+  children
 }) => {
   const [width] = useWindowResize()
   // prettier-ignore

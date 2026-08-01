@@ -15,9 +15,9 @@ type ContextType = {
 
 // 초기화
 export const AuthContext = createContext<ContextType>({
-  signup: (email: string, pw: string, callback?: Callback) => {},
-  login: (email: string, pw: string, callback?: Callback) => {},
-  logout: (callback?: Callback) => {}
+  signup: () => {},
+  login: () => {},
+  logout: () => {}
 })
 
 type AuthProviderProps = {}
@@ -27,12 +27,12 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
 
   const signup = useCallback((email: string, pw: string, callback?: Callback) => {
     const user = {email, pw}
-    setLoggedUser(notUsed => ({email, pw}))
+    setLoggedUser(() => ({email, pw}))
     U.writeObjectP('user', user).finally(() => callback && callback())
     // callback && callback()
   }, [])
   const login = useCallback((email: string, pw: string, callback?: Callback) => {
-    setLoggedUser(notUsed => ({email, pw}))
+    setLoggedUser(() => ({email, pw}))
     callback && callback()
   }, [])
   const logout = useCallback((callback?: Callback) => {
