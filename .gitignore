@@ -174,3 +174,4 @@ hs_err_pid*
 .env.local
 application-local.properties
 uploads/
+.playwright-mcp/

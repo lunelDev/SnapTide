@@ -1,7 +1,7 @@
 # 🌊 SnapTide
 
 사진 기반 **소셜 플랫폼 (SNS)** 으로, 사용자가 사진을 공유하고 댓글을 통해 소통할 수 있는 풀스택 웹 애플리케이션입니다.  
-Spring Boot 기반 REST API 서버와 React(TypeScript) 클라이언트로 구성되었습니다.  
+Spring Boot 기반 REST API 서버와 React(TypeScript) 클라이언트로 구성되었으며, 프론트엔드는 **인스타그램풍 클린 디자인**으로 구현했습니다.
 
 이 프로젝트는 **회원 인증 → 피드 CRUD → 이미지 업로드 → 검색/필터링 → 반응형 UI**까지 웹 서비스의 전 과정을 직접 구현한 개인 포트폴리오용 프로젝트입니다.
 
@@ -22,8 +22,21 @@ Spring Boot 기반 REST API 서버와 React(TypeScript) 클라이언트로 구�
   * 로그인/회원가입 UI + 토큰 관리(sessionStorage)
   * 피드 등록/수정/삭제/조회 화면 + 이미지 업로드 기능
   * 키워드 검색, 카테고리 필터링, 페이징 처리
-  * 반응형 UI (Bootstrap + Tailwind CSS)
+  * **Tailwind 단일 디자인 시스템**으로 구현한 인스타그램풍 클린 UI
+    * 브랜드 팔레트·Pretendard 폰트·그림자 토큰 정의 (`tailwind.config.js`)
+    * 재사용 컴포넌트 클래스 `st-card` / `st-input` / `st-btn` / `st-brand`(그라디언트 워드마크)
+    * 피드 목록을 **반응형 카드 그리드**로 구성 + 클린 검색바·페이지네이션
   * Fetch API 기반 서버 연동
+
+## 화면 미리보기
+
+| 로그인 | 회원가입 |
+|---|---|
+| ![로그인 화면](./login.png) | ![회원가입 화면](./join.png) |
+
+| 피드 목록 | 새 게시물 작성 |
+|---|---|
+| ![피드 목록 화면](./list-empty.png) | ![게시물 작성 화면](./register.png) |
 
 ## 학습 포인트 & 성과
 
@@ -37,7 +50,7 @@ Spring Boot 기반 REST API 서버와 React(TypeScript) 클라이언트로 구�
 | 구분 | 사용 기술 |
 |------|-----------|
 | **Backend** | Java 17, Spring Boot 3.x, Spring Data JPA, Spring Security (JWT), MariaDB, Maven |
-| **Frontend** | React 18+, TypeScript, React Router, Bootstrap / Tailwind CSS, Fetch API, JWT 인증 |
+| **Frontend** | React 18+, TypeScript, Vite, React Router, Tailwind CSS(단일 디자인 시스템), Pretendard, Fetch API, JWT 인증 |
 | **Tools** | IntelliJ, VS Code, Git |
 
 ## 🚀 주요 기능
@@ -49,7 +62,7 @@ Spring Boot 기반 REST API 서버와 React(TypeScript) 클라이언트로 구�
 | 피드 관리 | 피드 등록, 수정, 삭제, 조회, 페이징 처리 |
 | 리뷰 관리 | 피드·사진에 대한 리뷰 CRUD |
 | 사진 업로드 | Multipart 파일 업로드 및 URL 반환 |
-| UI/UX | 반응형 디자인, 사진 목록·검색·필터링 |
+| UI/UX | 인스타그램풍 클린 디자인(Tailwind), 반응형 카드 그리드, 사진 목록·검색·필터링 |
 | 예외 처리 | ControllerAdvice 기반 전역 예외 처리 |
 
 ## 🧱 ERD 다이어그램
